@@ -1,0 +1,7 @@
+ipykernel
+numpy
+opencv-python
+matplotlib
+tqdm
+torch
+torchvision
