@@ -1,3 +1,3 @@
 venv
 data
-model*
+model_scratch.pt
