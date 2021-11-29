@@ -7,6 +7,30 @@ from model import Net
 from train import train
 from loaders import get_loaders
 
+
+def main(seed, batch_size, train_dir, valid_dir, test_dir, model_dir, epochs, device):
+
+    print("Using device {}.".format(device))
+
+    torch.manual_seed(seed)
+
+    # Load the training data.
+    loaders = get_loaders(batch_size, train_dir, valid_dir, test_dir)
+
+    # Build the model.
+    model = Net().to(device)
+
+    print("Model loaded")
+
+    # Train the model.
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-7, weight_decay=1e-2)
+    loss_fn = torch.nn.CrossEntropyLoss()
+
+    model_path = os.path.join(model_dir, "model.pth")
+
+    train(epochs, loaders, model, optimizer, loss_fn, device, model_path)
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -52,24 +76,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("Using device {}.".format(device))
 
-    torch.manual_seed(args.seed)
-
-    # Load the training data.
-    loaders = get_loaders(
-        args.batch_size, args.train_dir, args.valid_dir, args.test_dir
+    main(
+        args.seed,
+        args.batch_size,
+        args.train_dir,
+        args.valid_dir,
+        args.test_dir,
+        args.model_dir,
+        args.epochs,
+        device,
     )
-
-    # Build the model.
-    model = Net().to(device)
-
-    print("Model loaded")
-
-    # Train the model.
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-7, weight_decay=1e-2)
-    loss_fn = torch.nn.CrossEntropyLoss()
-
-    model_path = os.path.join(args.model_dir, "model.pth")
-
-    train(args.epochs, loaders, model, optimizer, loss_fn, device, model_path)
