@@ -57,16 +57,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--batch-size",
         type=int,
-        default=16,
+        default=32,
         metavar="N",
-        help="input batch size for training (default: 16)",
+        help="input batch size for training (default: 32)",
     )
     parser.add_argument(
         "--epochs",
         type=int,
-        default=10,
+        default=5,
         metavar="N",
-        help="number of epochs to train (default: 10)",
+        help="number of epochs to train (default: 5)",
     )
     parser.add_argument(
         "--seed", type=int, default=1, metavar="S", help="random seed (default: 1)"
