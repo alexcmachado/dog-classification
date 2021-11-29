@@ -62,7 +62,11 @@ def main(
     t_sec = end_time - start_time
     (t_min, t_sec) = divmod(t_sec, 60)
     (t_hour, t_min) = divmod(t_min, 60)
-    print(f"Total training time: {t_hour:.0f} h, {t_min:.0f} min, {t_sec:.0f} sec")
+    print(
+        "Total training time: {:.0f} h, {:.0f} min, {:.0f} sec".format(
+            t_hour, t_min, t_sec
+        )
+    )
 
 
 if __name__ == "__main__":
