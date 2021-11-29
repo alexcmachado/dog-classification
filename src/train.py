@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from torch.optim.lr_scheduler import OneCycleLR
 
 from PIL import ImageFile
 
@@ -10,6 +11,10 @@ def train(n_epochs, loaders, model, optimizer, criterion, device, save_path):
     """returns trained model"""
 
     valid_loss_min = np.Inf
+
+    scheduler = OneCycleLR(
+        optimizer, max_lr=1e-4, steps_per_epoch=len(loaders["train"]), epochs=n_epochs
+    )
 
     for epoch in range(1, n_epochs + 1):
         train_loss = 0.0
@@ -27,6 +32,9 @@ def train(n_epochs, loaders, model, optimizer, criterion, device, save_path):
             optimizer.step()
 
             train_loss += (1 / (batch_idx + 1)) * (loss.data - train_loss)
+            scheduler.step()
+            if batch_idx + 1 == len(loaders["train"]):
+                print(scheduler.get_last_lr())
 
         model.eval()
         for batch_idx, (data, target) in enumerate(loaders["valid"]):
