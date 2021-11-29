@@ -15,6 +15,7 @@ def main(
     train_dir,
     valid_dir,
     test_dir,
+    hidden_dim,
     model_dir,
     epochs,
     device,
@@ -28,7 +29,7 @@ def main(
     loaders = get_loaders(image_size, batch_size, train_dir, valid_dir, test_dir)
 
     # Build the model.
-    model = Net().to(device)
+    model = Net(hidden_dim=hidden_dim).to(device)
 
     print("Model loaded")
 
@@ -71,6 +72,15 @@ if __name__ == "__main__":
         "--seed", type=int, default=1, metavar="S", help="random seed (default: 1)"
     )
 
+    # Model Parameters
+    parser.add_argument(
+        "--hidden-dim",
+        type=int,
+        default=2048,
+        metavar="N",
+        help="size of the hidden dimension (default: 2048)",
+    )
+
     # SageMaker Parameters
     parser.add_argument(
         "--hosts", type=list, default=json.loads(os.environ["SM_HOSTS"])
@@ -101,6 +111,7 @@ if __name__ == "__main__":
         args.train_dir,
         args.valid_dir,
         args.test_dir,
+        args.hidden_dim,
         args.model_dir,
         args.epochs,
         device,
