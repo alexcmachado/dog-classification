@@ -15,8 +15,13 @@ def main(
     train_dir,
     valid_dir,
     test_dir,
+    input_dim,
+    conv_out_dim,
+    conv_kernel_size,
+    pool_kernel_size,
     hidden_dim,
     drop_prob,
+    output_dim,
     model_dir,
     epochs,
     device,
@@ -30,7 +35,15 @@ def main(
     loaders = get_loaders(image_size, batch_size, train_dir, valid_dir, test_dir)
 
     # Build the model.
-    model = Net(hidden_dim=hidden_dim, drop_prob=drop_prob).to(device)
+    model = Net(
+        input_dim=input_dim,
+        conv_out_dim=conv_out_dim,
+        conv_kernel_size=conv_kernel_size,
+        pool_kernel_size=pool_kernel_size,
+        hidden_dim=hidden_dim,
+        drop_prob=drop_prob,
+        output_dim=output_dim,
+    ).to(device)
 
     print("Model loaded")
 
@@ -75,6 +88,34 @@ if __name__ == "__main__":
 
     # Model Parameters
     parser.add_argument(
+        "--input-dim",
+        type=int,
+        default=3,
+        metavar="N",
+        help="size of the input dimension (default: 3)",
+    )
+    parser.add_argument(
+        "--conv-out-dim",
+        type=int,
+        default=32,
+        metavar="N",
+        help="size of the convolutional layer output dimension (default: 32)",
+    )
+    parser.add_argument(
+        "--conv-kernel-size",
+        type=int,
+        default=3,
+        metavar="N",
+        help="size of the convolutional layer kernel (default: 3)",
+    )
+    parser.add_argument(
+        "--pool-kernel-size",
+        type=int,
+        default=3,
+        metavar="N",
+        help="size of the pooling layer kernel (default: 3)",
+    )
+    parser.add_argument(
         "--hidden-dim",
         type=int,
         default=2048,
@@ -87,6 +128,13 @@ if __name__ == "__main__":
         default=0.5,
         metavar="N",
         help="Drop probability (default: 0.5)",
+    )
+    parser.add_argument(
+        "--output-dim",
+        type=int,
+        default=133,
+        metavar="N",
+        help="size of the output dimension (default: 133)",
     )
 
     # SageMaker Parameters
@@ -119,8 +167,13 @@ if __name__ == "__main__":
         args.train_dir,
         args.valid_dir,
         args.test_dir,
+        args.input_dim,
+        args.conv_out_dim,
+        args.conv_kernel_size,
+        args.pool_kernel_size,
         args.hidden_dim,
         args.drop_prob,
+        args.output_dim,
         args.model_dir,
         args.epochs,
         device,
