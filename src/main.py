@@ -16,6 +16,7 @@ def main(
     valid_dir,
     test_dir,
     hidden_dim,
+    drop_prob,
     model_dir,
     epochs,
     device,
@@ -29,7 +30,7 @@ def main(
     loaders = get_loaders(image_size, batch_size, train_dir, valid_dir, test_dir)
 
     # Build the model.
-    model = Net(hidden_dim=hidden_dim).to(device)
+    model = Net(hidden_dim=hidden_dim, drop_prob=drop_prob).to(device)
 
     print("Model loaded")
 
@@ -80,6 +81,13 @@ if __name__ == "__main__":
         metavar="N",
         help="size of the hidden dimension (default: 2048)",
     )
+    parser.add_argument(
+        "--drop-prob",
+        type=float,
+        default=0.5,
+        metavar="N",
+        help="Drop probability (default: 0.5)",
+    )
 
     # SageMaker Parameters
     parser.add_argument(
@@ -112,6 +120,7 @@ if __name__ == "__main__":
         args.valid_dir,
         args.test_dir,
         args.hidden_dim,
+        args.drop_prob,
         args.model_dir,
         args.epochs,
         device,
