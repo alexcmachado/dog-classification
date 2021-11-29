@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import torch
+import timeit
 
 from model import Net
 from train import train
@@ -53,7 +54,15 @@ def main(
 
     model_path = os.path.join(model_dir, "model.pth")
 
+    start_time = timeit.default_timer()
+
     train(epochs, loaders, model, optimizer, loss_fn, device, model_path)
+
+    end_time = timeit.default_timer()
+    t_sec = end_time - start_time
+    (t_min, t_sec) = divmod(t_sec, 60)
+    (t_hour, t_min) = divmod(t_min, 60)
+    print(f"Total training time: {t_hour:.0f} h, {t_min:.0f} min, {t_sec:.0f} sec")
 
 
 if __name__ == "__main__":
