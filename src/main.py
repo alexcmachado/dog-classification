@@ -8,14 +8,24 @@ from train import train
 from loaders import get_loaders
 
 
-def main(seed, batch_size, train_dir, valid_dir, test_dir, model_dir, epochs, device):
+def main(
+    seed,
+    image_size,
+    batch_size,
+    train_dir,
+    valid_dir,
+    test_dir,
+    model_dir,
+    epochs,
+    device,
+):
 
     print("Using device {}.".format(device))
 
     torch.manual_seed(seed)
 
     # Load the training data.
-    loaders = get_loaders(batch_size, train_dir, valid_dir, test_dir)
+    loaders = get_loaders(image_size, batch_size, train_dir, valid_dir, test_dir)
 
     # Build the model.
     model = Net().to(device)
@@ -36,6 +46,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # Training Parameters
+    parser.add_argument(
+        "--image-size",
+        type=int,
+        default=64,
+        metavar="N",
+        help="size of input images (default: 64)",
+    )
     parser.add_argument(
         "--batch-size",
         type=int,
@@ -79,6 +96,7 @@ if __name__ == "__main__":
 
     main(
         args.seed,
+        args.image_size,
         args.batch_size,
         args.train_dir,
         args.valid_dir,

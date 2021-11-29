@@ -3,13 +3,13 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 
 
-def get_loaders(batch_size, train_dir, valid_dir, test_dir):
+def get_loaders(image_size, batch_size, train_dir, valid_dir, test_dir):
     print("Get train data loader.")
 
     transform = transforms.Compose(
         [
-            transforms.Resize(64),
-            transforms.CenterCrop(64),
+            transforms.Resize(image_size),
+            transforms.CenterCrop(image_size),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
