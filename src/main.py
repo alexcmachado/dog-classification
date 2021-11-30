@@ -63,7 +63,7 @@ def main(
 
     start_time = timeit.default_timer()
 
-    train(epochs, loaders, model, optimizer, loss_fn, use_cuda, model_path)
+    model = train(epochs, loaders, model, optimizer, loss_fn, use_cuda, model_path)
 
     end_time = timeit.default_timer()
     t_sec = end_time - start_time
@@ -74,6 +74,8 @@ def main(
             t_hour, t_min, t_sec
         )
     )
+
+    return model, loaders
 
 
 if __name__ == "__main__":
