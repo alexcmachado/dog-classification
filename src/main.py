@@ -67,7 +67,7 @@ def main(
     print("Model loaded")
 
     # Train the model.
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-7, weight_decay=1e-2)
     loss_fn = torch.nn.CrossEntropyLoss()
 
     model_path = os.path.join(model_dir, "model.pth")
