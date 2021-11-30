@@ -3,14 +3,18 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 
 
-def get_loaders(image_size, batch_size, train_dir, valid_dir, test_dir):
+def get_loaders(
+    image_size, batch_size, train_dir, valid_dir, test_dir, flip_prob, erase_prob
+):
     print("Get train data loader.")
 
     transform = transforms.Compose(
         [
+            transforms.RandomHorizontalFlip(flip_prob),
             transforms.Resize(image_size),
             transforms.CenterCrop(image_size),
             transforms.ToTensor(),
+            transforms.RandomErasing(erase_prob),
         ]
     )
 

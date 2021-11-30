@@ -18,6 +18,8 @@ def main(
     train_dir,
     valid_dir,
     test_dir,
+    flip_prob,
+    erase_prob,
     input_dim,
     conv1_out_dim,
     conv2_out_dim,
@@ -36,7 +38,9 @@ def main(
     torch.manual_seed(seed)
 
     # Load the training data.
-    loaders = get_loaders(image_size, batch_size, train_dir, valid_dir, test_dir)
+    loaders = get_loaders(
+        image_size, batch_size, train_dir, valid_dir, test_dir, flip_prob, erase_prob
+    )
 
     hidden_dim = conv3_out_dim * (math.floor(image_size / pool_kernel_size ** 3)) ** 2
 
@@ -176,6 +180,20 @@ if __name__ == "__main__":
         metavar="N",
         help="size of the output dimension (default: 133)",
     )
+    parser.add_argument(
+        "--flip-prob",
+        type=float,
+        default=0.5,
+        metavar="N",
+        help="Flip probability (default: 0.5)",
+    )
+    parser.add_argument(
+        "--erase-prob",
+        type=float,
+        default=0.5,
+        metavar="N",
+        help="Erase probability (default: 0.5)",
+    )
 
     # SageMaker Parameters
     parser.add_argument(
@@ -215,6 +233,8 @@ if __name__ == "__main__":
         args.pool_kernel_size,
         args.drop_prob,
         args.output_dim,
+        args.flip_prob,
+        args.erase_prob,
         args.model_dir,
         args.epochs,
         use_cuda,
