@@ -7,7 +7,7 @@ from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-def train(n_epochs, loaders, model, optimizer, criterion, device, save_path):
+def train(n_epochs, loaders, model, optimizer, criterion, use_cuda, save_path):
     """returns trained model"""
 
     valid_loss_min = np.Inf
@@ -23,7 +23,8 @@ def train(n_epochs, loaders, model, optimizer, criterion, device, save_path):
         model.train()
         for batch_idx, (data, target) in enumerate(loaders["train"]):
 
-            data, target = data.to(device), target.to(device)
+            if use_cuda:
+                data, target = data.cuda(), target.cuda()
 
             optimizer.zero_grad()
             outputs = model(data)
@@ -39,7 +40,8 @@ def train(n_epochs, loaders, model, optimizer, criterion, device, save_path):
         model.eval()
         for batch_idx, (data, target) in enumerate(loaders["valid"]):
 
-            data, target = data.to(device), target.to(device)
+            if use_cuda:
+                data, target = data.cuda(), target.cuda()
 
             outputs = model(data)
             loss = criterion(outputs, target)

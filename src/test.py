@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def test(loaders, model, criterion, device):
+def test(loaders, model, criterion, use_cuda):
 
     # monitor test loss and accuracy
     test_loss = 0.0
@@ -11,7 +11,8 @@ def test(loaders, model, criterion, device):
     model.eval()
     for batch_idx, (data, target) in enumerate(loaders["test"]):
         # move to GPU
-        data, target = data.to(device), target.to(device)
+        if use_cuda:
+            data, target = data.cuda(), target.cuda()
         # forward pass: compute predicted outputs by passing inputs to the model
         output = model(data)
         # calculate the loss

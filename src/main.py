@@ -27,10 +27,10 @@ def main(
     output_dim,
     model_dir,
     epochs,
-    device,
+    use_cuda,
 ):
 
-    print("Using device {}.".format(device))
+    print("Use cuda: {}.".format(use_cuda))
 
     torch.manual_seed(seed)
 
@@ -48,7 +48,10 @@ def main(
         hidden_dim=hidden_dim,
         drop_prob=drop_prob,
         output_dim=output_dim,
-    ).to(device)
+    )
+
+    if use_cuda:
+        model.cuda()
 
     print("Model loaded")
 
@@ -60,7 +63,7 @@ def main(
 
     start_time = timeit.default_timer()
 
-    train(epochs, loaders, model, optimizer, loss_fn, device, model_path)
+    train(epochs, loaders, model, optimizer, loss_fn, use_cuda, model_path)
 
     end_time = timeit.default_timer()
     t_sec = end_time - start_time
@@ -189,7 +192,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    use_cuda = torch.cuda.is_available()
 
     main(
         args.seed,
@@ -209,5 +212,5 @@ if __name__ == "__main__":
         args.output_dim,
         args.model_dir,
         args.epochs,
-        device,
+        use_cuda,
     )
