@@ -4,6 +4,7 @@ import os
 import torch
 from torchsummary import summary
 import timeit
+import math
 
 from model import Net
 from train import train
@@ -23,7 +24,6 @@ def main(
     conv3_out_dim,
     conv_kernel_size,
     pool_kernel_size,
-    hidden_dim,
     drop_prob,
     output_dim,
     model_dir,
@@ -37,6 +37,8 @@ def main(
 
     # Load the training data.
     loaders = get_loaders(image_size, batch_size, train_dir, valid_dir, test_dir)
+
+    hidden_dim = conv3_out_dim * (math.floor(image_size / pool_kernel_size ** 3)) ** 2
 
     # Build the model.
     model = Net(
@@ -161,13 +163,6 @@ if __name__ == "__main__":
         help="size of the pooling layer kernel (default: 3)",
     )
     parser.add_argument(
-        "--hidden-dim",
-        type=int,
-        default=2048,
-        metavar="N",
-        help="size of the hidden dimension (default: 2048)",
-    )
-    parser.add_argument(
         "--drop-prob",
         type=float,
         default=0.5,
@@ -218,7 +213,6 @@ if __name__ == "__main__":
         args.conv3_out_dim,
         args.conv_kernel_size,
         args.pool_kernel_size,
-        args.hidden_dim,
         args.drop_prob,
         args.output_dim,
         args.model_dir,
