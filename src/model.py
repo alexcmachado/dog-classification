@@ -16,6 +16,9 @@ class Net(nn.Module):
         output_dim,
     ):
         super(Net, self).__init__()
+
+        self.hidden_dim = hidden_dim
+
         self.conv1 = nn.Conv2d(input_dim, conv1_out_dim, conv_kernel_size, padding=1)
         self.bn1 = nn.BatchNorm2d(conv1_out_dim)
 
@@ -31,13 +34,13 @@ class Net(nn.Module):
 
         self.pool = nn.MaxPool2d(pool_kernel_size)
         self.dropout = nn.Dropout(drop_prob)
-        self.fc1 = nn.Linear(hidden_dim, output_dim)
+        self.fc1 = nn.Linear(self.hidden_dim, output_dim)
 
     def forward(self, x):
         x = self.pool(F.relu(self.bn1(self.conv1(x))))
         x = self.pool(F.relu(self.bn2(self.conv2(x))))
         x = self.pool(F.relu(self.bn3(self.conv3(x))))
-        x = x.view(x.size(0), -1)
+        x = x.view(-1, self.hidden_dim)
         x = self.dropout(x)
         x = self.fc1(x)
         return x
