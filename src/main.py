@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import torch
+from torchsummary import summary
 import timeit
 
 from model import Net
@@ -52,6 +53,14 @@ def main(
 
     if use_cuda:
         model.cuda()
+        device = "cuda"
+
+    summary(
+        model,
+        input_size=(input_dim, image_size, image_size),
+        device=device,
+        batch_size=batch_size,
+    )
 
     print("Model loaded")
 
@@ -75,7 +84,7 @@ def main(
         )
     )
 
-    return model, loaders
+    return model, loaders, optimizer, loss_fn
 
 
 if __name__ == "__main__":
