@@ -17,7 +17,9 @@ def main(
     valid_dir,
     test_dir,
     input_dim,
-    conv_out_dim,
+    conv1_out_dim,
+    conv2_out_dim,
+    conv3_out_dim,
     conv_kernel_size,
     pool_kernel_size,
     hidden_dim,
@@ -38,7 +40,9 @@ def main(
     # Build the model.
     model = Net(
         input_dim=input_dim,
-        conv_out_dim=conv_out_dim,
+        conv1_out_dim=conv1_out_dim,
+        conv2_out_dim=conv2_out_dim,
+        conv3_out_dim=conv3_out_dim,
         conv_kernel_size=conv_kernel_size,
         pool_kernel_size=pool_kernel_size,
         hidden_dim=hidden_dim,
@@ -108,7 +112,21 @@ if __name__ == "__main__":
         help="size of the input dimension (default: 3)",
     )
     parser.add_argument(
-        "--conv-out-dim",
+        "--conv1-out-dim",
+        type=int,
+        default=8,
+        metavar="N",
+        help="size of the convolutional layer output dimension (default: 32)",
+    )
+    parser.add_argument(
+        "--conv2-out-dim",
+        type=int,
+        default=16,
+        metavar="N",
+        help="size of the convolutional layer output dimension (default: 32)",
+    )
+    parser.add_argument(
+        "--conv3-out-dim",
         type=int,
         default=32,
         metavar="N",
@@ -124,7 +142,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pool-kernel-size",
         type=int,
-        default=3,
+        default=2,
         metavar="N",
         help="size of the pooling layer kernel (default: 3)",
     )
@@ -181,7 +199,9 @@ if __name__ == "__main__":
         args.valid_dir,
         args.test_dir,
         args.input_dim,
-        args.conv_out_dim,
+        args.conv1_out_dim,
+        args.conv2_out_dim,
+        args.conv3_out_dim,
         args.conv_kernel_size,
         args.pool_kernel_size,
         args.hidden_dim,
