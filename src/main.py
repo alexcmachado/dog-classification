@@ -36,6 +36,8 @@ def main(
     print("Use cuda: {}.".format(use_cuda))
 
     torch.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
     # Load the training data.
     loaders = get_loaders(
@@ -120,7 +122,7 @@ if __name__ == "__main__":
         help="number of epochs to train (default: 5)",
     )
     parser.add_argument(
-        "--seed", type=int, default=1, metavar="S", help="random seed (default: 1)"
+        "--seed", type=int, default=0, metavar="S", help="random seed (default: 0)"
     )
 
     # Model Parameters
