@@ -8,6 +8,8 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 if version.parse(torch.__version__) >= version.parse("1.3.0"):
     use_scheduler = True
+else:
+    use_scheduler = False
 
 
 def train(n_epochs, loaders, model, optimizer, criterion, use_cuda, save_path):
