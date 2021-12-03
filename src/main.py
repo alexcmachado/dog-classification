@@ -62,9 +62,14 @@ def main(
         for param in model.features.parameters():
             param.requires_grad = False
 
+        params_to_update = []
+        for name, param in model.named_parameters():
+            if param.requires_grad == True:
+                params_to_update.append(param)
+
         model.classifier[6] = torch.nn.Linear(4096, output_dim, bias=True)
 
-        optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+        optimizer = torch.optim.SGD(params_to_update, lr=0.001, momentum=0.9)
 
     else:
         model = Net(
