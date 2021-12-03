@@ -3,6 +3,7 @@ import json
 import os
 import torch
 from torchsummary import summary
+import torchvision.models as models
 import timeit
 import math
 
@@ -13,13 +14,14 @@ from loaders import get_loaders
 
 def main(
     seed,
-    image_size,
+    resize,
+    crop_size,
     batch_size,
     train_dir,
     valid_dir,
     test_dir,
     flip_prob,
-    erase_prob,
+    degrees,
     input_dim,
     conv1_out_dim,
     conv2_out_dim,
@@ -31,6 +33,7 @@ def main(
     model_dir,
     epochs,
     use_cuda,
+    use_transfer,
 ):
 
     print("Use cuda: {}.".format(use_cuda))
@@ -41,31 +44,52 @@ def main(
 
     # Load the training data.
     loaders = get_loaders(
-        image_size, batch_size, train_dir, valid_dir, test_dir, flip_prob, erase_prob
+        resize,
+        crop_size,
+        batch_size,
+        train_dir,
+        valid_dir,
+        test_dir,
+        flip_prob,
+        degrees,
     )
 
-    hidden_dim = conv3_out_dim * (math.floor(image_size / pool_kernel_size ** 3)) ** 2
+    hidden_dim = conv3_out_dim * (math.floor(crop_size / pool_kernel_size ** 3)) ** 2
 
     # Build the model.
-    model = Net(
-        input_dim=input_dim,
-        conv1_out_dim=conv1_out_dim,
-        conv2_out_dim=conv2_out_dim,
-        conv3_out_dim=conv3_out_dim,
-        conv_kernel_size=conv_kernel_size,
-        pool_kernel_size=pool_kernel_size,
-        hidden_dim=hidden_dim,
-        drop_prob=drop_prob,
-        output_dim=output_dim,
-    )
+    if use_transfer:
+        model = models.vgg11(pretrained=True)
+        for param in model.features.parameters():
+            param.requires_grad = False
+
+        model.classifier[6] = torch.nn.Linear(4096, output_dim, bias=True)
+
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+
+    else:
+        model = Net(
+            input_dim=input_dim,
+            conv1_out_dim=conv1_out_dim,
+            conv2_out_dim=conv2_out_dim,
+            conv3_out_dim=conv3_out_dim,
+            conv_kernel_size=conv_kernel_size,
+            pool_kernel_size=pool_kernel_size,
+            hidden_dim=hidden_dim,
+            drop_prob=drop_prob,
+            output_dim=output_dim,
+        )
+
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-7, weight_decay=1e-2)
 
     if use_cuda:
         model.cuda()
         device = "cuda"
+    else:
+        device = "cpu"
 
     summary(
         model,
-        input_size=(input_dim, image_size, image_size),
+        input_size=(input_dim, crop_size, crop_size),
         device=device,
         batch_size=batch_size,
     )
@@ -73,7 +97,6 @@ def main(
     print("Model loaded")
 
     # Train the model.
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-7, weight_decay=1e-2)
     loss_fn = torch.nn.CrossEntropyLoss()
 
     model_path = os.path.join(model_dir, "model.pth")
@@ -101,11 +124,18 @@ if __name__ == "__main__":
 
     # Training Parameters
     parser.add_argument(
-        "--image-size",
+        "--resize",
         type=int,
         default=64,
         metavar="N",
-        help="size of input images (default: 64)",
+        help="size after resize in px (default: 64)",
+    )
+    parser.add_argument(
+        "--crop-size",
+        type=int,
+        default=64,
+        metavar="N",
+        help="size after crop (default: 64)",
     )
     parser.add_argument(
         "--batch-size",
@@ -190,11 +220,18 @@ if __name__ == "__main__":
         help="Flip probability (default: 0.5)",
     )
     parser.add_argument(
-        "--erase-prob",
+        "--degrees",
         type=float,
-        default=0.5,
+        default=30,
         metavar="N",
-        help="Erase probability (default: 0.5)",
+        help="Rotation in degrees (default: 30)",
+    )
+    parser.add_argument(
+        "--use-transfer",
+        type=bool,
+        default=False,
+        metavar="N",
+        help="Use transfer learning (default: False)",
     )
 
     # SageMaker Parameters
@@ -222,13 +259,14 @@ if __name__ == "__main__":
 
     main(
         args.seed,
-        args.image_size,
+        args.resize,
+        args.crop_size,
         args.batch_size,
         args.train_dir,
         args.valid_dir,
         args.test_dir,
         args.flip_prob,
-        args.erase_prob,
+        args.degrees,
         args.input_dim,
         args.conv1_out_dim,
         args.conv2_out_dim,
@@ -240,4 +278,5 @@ if __name__ == "__main__":
         args.model_dir,
         args.epochs,
         use_cuda,
+        args.use_transfer,
     )
