@@ -84,7 +84,7 @@ def main(
             output_dim=output_dim,
         )
 
-        optimizer = torch.optim.Adam(model.parameters(), lr=1e-7, weight_decay=1e-2)
+        optimizer = torch.optim.Adam(model.parameters())
 
     if use_cuda:
         model.cuda()
