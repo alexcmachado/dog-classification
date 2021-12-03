@@ -1,29 +1,15 @@
 import torch
 import numpy as np
-from packaging import version
 
 from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-
-if version.parse(torch.__version__) >= version.parse("1.3.0"):
-    use_scheduler = True
-else:
-    use_scheduler = False
 
 
 def train(n_epochs, loaders, model, optimizer, criterion, use_cuda, save_path):
     """returns trained model"""
 
     valid_loss_min = np.Inf
-
-    if use_scheduler:
-        scheduler = torch.optim.lr_scheduler.OneCycleLR(
-            optimizer,
-            max_lr=1e-4,
-            steps_per_epoch=len(loaders["train"]),
-            epochs=n_epochs,
-        )
 
     for epoch in range(1, n_epochs + 1):
         train_loss = 0.0
@@ -42,11 +28,6 @@ def train(n_epochs, loaders, model, optimizer, criterion, use_cuda, save_path):
             optimizer.step()
 
             train_loss += (1 / (batch_idx + 1)) * (loss.data - train_loss)
-
-            if use_scheduler:
-                scheduler.step()
-                if batch_idx + 1 == len(loaders["train"]):
-                    print(scheduler.get_last_lr())
 
         model.eval()
         for batch_idx, (data, target) in enumerate(loaders["valid"]):
