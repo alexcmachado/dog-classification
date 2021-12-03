@@ -11,8 +11,8 @@ class Net(nn.Module):
         conv3_out_dim,
         conv_kernel_size,
         pool_kernel_size,
-        hidden_dim,
         drop_prob,
+        hidden_dim,
         output_dim,
     ):
         super(Net, self).__init__()

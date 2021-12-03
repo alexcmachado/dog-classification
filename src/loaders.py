@@ -4,7 +4,7 @@ from torchvision import datasets
 
 
 def get_loaders(
-    resize, crop_size, batch_size, train_dir, valid_dir, test_dir, flip_prob, degrees
+    resize, crop_size, degrees, flip_prob, batch_size, train_dir, valid_dir, test_dir
 ):
     print("Get train data loader.")
 
