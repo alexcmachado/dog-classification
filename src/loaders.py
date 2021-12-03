@@ -4,25 +4,24 @@ from torchvision import datasets
 
 
 def get_loaders(
-    image_size, batch_size, train_dir, valid_dir, test_dir, flip_prob, erase_prob
+    resize, crop_size, batch_size, train_dir, valid_dir, test_dir, flip_prob, degrees
 ):
     print("Get train data loader.")
 
     transform_train = transforms.Compose(
         [
+            transforms.RandomRotation(degrees),
+            transforms.RandomResizedCrop(crop_size),
             transforms.RandomHorizontalFlip(flip_prob),
-            transforms.Resize(image_size),
-            transforms.CenterCrop(image_size),
             transforms.ToTensor(),
-            transforms.RandomErasing(erase_prob),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
     )
 
     transform_valid_test = transforms.Compose(
         [
-            transforms.Resize(image_size),
-            transforms.CenterCrop(image_size),
+            transforms.Resize(resize),
+            transforms.CenterCrop(crop_size),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
