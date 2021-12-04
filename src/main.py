@@ -69,8 +69,6 @@ def main(
 
         model.classifier[6] = torch.nn.Linear(4096, output_dim, bias=True)
 
-        optimizer = torch.optim.SGD(params_to_update, lr=0.001, momentum=0.9)
-
     else:
         model = Net(
             input_dim=input_dim,
@@ -84,7 +82,7 @@ def main(
             output_dim=output_dim,
         )
 
-        optimizer = torch.optim.Adam(model.parameters())
+        params_to_update = model.parameters()
 
     if use_cuda:
         model.cuda()
@@ -102,6 +100,8 @@ def main(
     print("Model loaded")
 
     # Train the model.
+    optimizer = torch.optim.SGD(params_to_update, lr=0.001, momentum=0.9)
+
     loss_fn = torch.nn.CrossEntropyLoss()
 
     model_path = os.path.join(model_dir, "model.pth")
