@@ -46,12 +46,12 @@ def main(
     loaders = get_loaders(
         resize,
         crop_size,
+        degrees,
+        flip_prob,
         batch_size,
         train_dir,
         valid_dir,
         test_dir,
-        flip_prob,
-        degrees,
     )
 
     hidden_dim = conv3_out_dim * (math.floor(crop_size / pool_kernel_size ** 3)) ** 2
