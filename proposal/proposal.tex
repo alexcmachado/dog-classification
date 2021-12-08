@@ -1,0 +1,73 @@
+% !TEX program = xelatex
+\documentclass{article}
+
+% Used packages
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{fontspec}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage[scaled]{helvet}
+\usepackage[T1]{fontenc}
+
+
+% Document info
+\newcommand{\doctitle}{Dog Breed Classifier}
+\newcommand{\docsubtitle}{Udacity Machine Learning Engineer Nanodegree Capstone Proposal}
+\newcommand{\docauthor}{Alex Augusto Costa Machado}
+\newcommand{\docdate}{December 7\textsuperscript{th} 2021}
+
+% Page and margin setup
+\geometry{
+    a4paper,
+    left=2cm,
+    right=2cm,
+    top=2cm,
+    bottom=2cm,
+    headsep=3mm,
+    headheight=1.15cm
+    }
+    
+% Font setup
+\renewcommand\familydefault{\sfdefault} 
+
+% Header and footer setup
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\large{\doctitle}}
+\rfoot{\thepage\ / \pageref{LastPage}}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% First page setup
+\newcommand{\docinfo}{
+    \thispagestyle{empty}
+
+    \begin{center}
+
+        \Huge\textbf{\doctitle}
+        \vspace{2mm}
+
+        \LARGE\textbf{\docsubtitle}
+        
+        \vspace{3mm}
+        \large
+        Written by \textbf{\docauthor} on \textbf{\docdate}
+
+    \end{center}
+}
+
+% Document
+\begin{document}
+    \docinfo
+
+    \section{Domain Background}
+    \section{Problem Statement}
+    \section{Datasets and Inputs}
+    \section{Solution Statement}
+    \section{Benchmark Model}
+    \section{Evaluation Metrics}
+    \section{Project Design}
+
+\end{document}

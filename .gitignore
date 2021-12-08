@@ -4,3 +4,6 @@ output
 .vscode
 __pycache__
 .ipynb_checkpoints
+*.aux
+*.log
+*.synctex.gz
