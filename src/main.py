@@ -17,7 +17,8 @@ def model_fn(model_dir):
     print("Loading model.")
 
     # Determine the device and construct the model.
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # use_cuda = torch.cuda.is_available()
+    use_cuda = False
 
     model = models.vgg11(pretrained=True)
     model.classifier[6] = torch.nn.Linear(4096, 133, bias=True)
@@ -27,7 +28,10 @@ def model_fn(model_dir):
     with open(model_path, "rb") as f:
         model.load_state_dict(torch.load(f))
 
-    model.to(device).eval()
+    if use_cuda:
+        model.cuda()
+
+    model.eval()
 
     print("Done loading model.")
     return model
