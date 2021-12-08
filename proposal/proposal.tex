@@ -3,21 +3,18 @@
 
 % Used packages
 \usepackage{geometry}
-\usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{lastpage}
-\usepackage{fontspec}
-\usepackage{subcaption}
-\usepackage{amsmath}
 \usepackage[scaled]{helvet}
 \usepackage[T1]{fontenc}
-
+\usepackage{hyperref}
+\usepackage{indentfirst}
 
 % Document info
-\newcommand{\doctitle}{Dog Breed Classifier}
+\newcommand{\doctitle}{Convolutional Neural Network for Dog Breed Classification}
 \newcommand{\docsubtitle}{Udacity Machine Learning Engineer Nanodegree Capstone Proposal}
 \newcommand{\docauthor}{Alex Augusto Costa Machado}
-\newcommand{\docdate}{December 7\textsuperscript{th} 2021}
+\newcommand{\docdate}{December 8\textsuperscript{th} 2021}
 
 % Page and margin setup
 \geometry{
@@ -29,6 +26,16 @@
     headsep=3mm,
     headheight=1.15cm
     }
+
+% Paragraph setup
+\setlength{\parindent}{2.5em}
+\renewcommand{\baselinestretch}{1.25}
+
+% Hyperlink setup
+\hypersetup{
+    colorlinks=true,     
+    urlcolor=blue,
+    }
     
 % Font setup
 \renewcommand\familydefault{\sfdefault} 
@@ -37,7 +44,7 @@
 \pagestyle{fancy}
 \fancyhf{}
 \rhead{\large{\doctitle}}
-\rfoot{\thepage\ / \pageref{LastPage}}
+\rfoot{\thepage\ / \pageref*{LastPage}}
 \renewcommand{\footrulewidth}{0.4pt}
 
 % First page setup
@@ -63,11 +70,42 @@
     \docinfo
 
     \section{Domain Background}
+    For computer vision tasks, such as a dog breed classification, an algorithm mostly used is a Convolutional Neural Network, or CNN for short, which is a model that extracts features, like texture and edges, from spatial data.
+
+    The history behind this algorithm started during the 1950s, but it is around the year 2012 that CNNs saw a huge surge in popularity after a CNN called AlexNet achieved state-of-the-art performance labeling pictures in the \href{https://image-net.org/}{ImageNet} challenge. Alex Krizhevsky et al. published the paper "ImageNet Classification with Deep Convolutional Neural Networks" describing the winning AlexNet model.
+
     \section{Problem Statement}
+    The purpose of this project is to use a Convolutional Neural Network to classify dog breeds using images as input. For images that contain a human instead of a dog, the algorithm should display which dog breed resembles the human in the picture.
+
     \section{Datasets and Inputs}
+    There are two datasets for this project: one is a dog dataset containing 8351 images of 133 different dog breeds, and the other is a human dataset consisting of 13233 photos of 5749 different people. The dog dataset is divided in train, validation and test datasets.
+
     \section{Solution Statement}
+    Three main algorithms will be used for this project: a human face detector, a dog detector, and a dog breed classifier. More about each of these algorithms is described below.
+
+    \begin{itemize}
+        \item Human Face Detector: an OpenCV's implementation of Haar feature-based cascade classifier to detect human faces in images. The pre-trained face detector is stored as XML file on \href{https://github.com/opencv/opencv/tree/master/data/haarcascades}{GitHub}.
+        
+        \item Dog Detector: a pre-trained VGG-16 model with weights that have been trained on \href{https://image-net.org/}{ImageNet}, a very popular dataset used for image classification and other vision tasks.
+        
+        \item Dog Breed Classifier: a pre-trained VGG-11 model on which the last layer is altered to output 133 classes and trained further using the dog dataset mentioned earlier.
+    \end{itemize}
+
     \section{Benchmark Model}
+    The benchmark for the dog breed classifier will be a simple CNN model designed from scratch that will be compared to the final CNN obtained from transfer learning using a pre-trained VGG-11 model.
+
     \section{Evaluation Metrics}
+    The metric to evaluate the quality of the classifier is the accuracy of the dog breed predictions.
+
     \section{Project Design}
+    The workflow for this project is as follows:
+
+    \begin{itemize}
+        \item Data exploration: verify the information contained in the datasets.
+        \item Preprocessing: crop images to make sure all have the same size and normalize the input data.
+        \item Training and testing: create algorithms to train all three models mentioned earlier.
+        \item Refinement: use transfer learning to improve accuracy of dog breed classifier.
+        \item Performance evaluation: observe classification accuracy as the performance metric.
+    \end{itemize}
 
 \end{document}
