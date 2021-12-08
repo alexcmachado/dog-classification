@@ -26,7 +26,7 @@ def model_fn(model_dir):
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, "model.pth")
     with open(model_path, "rb") as f:
-        model.load_state_dict(torch.load(f))
+        model.load_state_dict(torch.load(f, map_location=torch.device("cpu")))
 
     if use_cuda:
         model.cuda()
