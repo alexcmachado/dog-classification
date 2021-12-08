@@ -16,14 +16,6 @@ def model_fn(model_dir):
     """Load the PyTorch model from the `model_dir` directory."""
     print("Loading model.")
 
-    # First, load the parameters used to create the model.
-    model_info = {}
-    model_info_path = os.path.join(model_dir, "model_info.pth")
-    with open(model_info_path, "rb") as f:
-        model_info = torch.load(f)
-
-    print("model_info: {}".format(model_info))
-
     # Determine the device and construct the model.
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
