@@ -14,10 +14,18 @@ def model_fn(model_dir):
     """Load the PyTorch model from the `model_dir` directory."""
     print("Loading model.")
 
+    # First, load the parameters used to create the model.
+    model_info = {}
+    model_info_path = os.path.join(model_dir, "model_info.pth")
+    with open(model_info_path, "rb") as f:
+        model_info = torch.load(f)
+
+    print("model_info: {}".format(model_info))
+
     # Determine the device and construct the model.
     use_cuda = torch.cuda.is_available()
 
-    model = get_model()
+    model = get_model(output_dim=model_info["output_dim"])
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, "model.pth")
@@ -43,6 +51,7 @@ def main(
     test_dir,
     flip_prob,
     degrees,
+    output_dim,
     model_dir,
     epochs,
     use_cuda,
@@ -67,7 +76,7 @@ def main(
     )
 
     # Build the model.
-    model = get_model()
+    model = get_model(output_dim)
 
     params_to_update = []
     for name, param in model.named_parameters():
@@ -99,7 +108,12 @@ def main(
         )
     )
 
-    return model, loaders, optimizer, criterion
+    model_info_path = os.path.join(model_dir, "model_info.pth")
+    with open(model_info_path, "wb") as f:
+        model_info = {
+            "output_dim": output_dim,
+        }
+        torch.save(model_info, f)
 
 
 if __name__ == "__main__":
@@ -140,6 +154,13 @@ if __name__ == "__main__":
     )
 
     # Model Parameters
+    parser.add_argument(
+        "--output-dim",
+        type=int,
+        default=133,
+        metavar="N",
+        help="size of the output dimension (default: 133)",
+    )
     parser.add_argument(
         "--flip-prob",
         type=float,
@@ -188,6 +209,7 @@ if __name__ == "__main__":
         args.test_dir,
         args.flip_prob,
         args.degrees,
+        args.output_dim,
         args.model_dir,
         args.epochs,
         use_cuda,

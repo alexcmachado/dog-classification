@@ -15,19 +15,27 @@ def model_fn(model_dir):
     """Load the PyTorch model from the `model_dir` directory."""
     print("Loading model.")
 
+    # First, load the parameters used to create the model.
+    model_info = {}
+    model_info_path = os.path.join(model_dir, "model_info.pth")
+    with open(model_info_path, "rb") as f:
+        model_info = torch.load(f)
+
+    print("model_info: {}".format(model_info))
+
     # Determine the device and construct the model.
     use_cuda = torch.cuda.is_available()
 
     model = Net(
-        input_dim=3,
-        conv1_out_dim=8,
-        conv2_out_dim=16,
-        conv3_out_dim=32,
-        conv_kernel_size=3,
-        pool_kernel_size=2,
-        hidden_dim=25088,
-        drop_prob=0.5,
-        output_dim=133,
+        input_dim=model_info["input_dim"],
+        conv1_out_dim=model_info["conv1_out_dim"],
+        conv2_out_dim=model_info["conv2_out_dim"],
+        conv3_out_dim=model_info["conv3_out_dim"],
+        conv_kernel_size=model_info["conv_kernel_size"],
+        pool_kernel_size=model_info["pool_kernel_size"],
+        hidden_dim=model_info["hidden_dim"],
+        drop_prob=model_info["drop_prob"],
+        output_dim=model_info["output_dim"],
     )
 
     # Load the stored model parameters.
@@ -126,7 +134,20 @@ def main(
         )
     )
 
-    return model, loaders, optimizer, criterion
+    model_info_path = os.path.join(model_dir, "model_info.pth")
+    with open(model_info_path, "wb") as f:
+        model_info = {
+            "input_dim": input_dim,
+            "conv1_out_dim": conv1_out_dim,
+            "conv2_out_dim": conv2_out_dim,
+            "conv3_out_dim": conv3_out_dim,
+            "conv_kernel_size": conv_kernel_size,
+            "pool_kernel_size": pool_kernel_size,
+            "hidden_dim": hidden_dim,
+            "drop_prob": drop_prob,
+            "output_dim": output_dim,
+        }
+        torch.save(model_info, f)
 
 
 if __name__ == "__main__":
