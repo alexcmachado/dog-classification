@@ -83,8 +83,6 @@ def main(
         if param.requires_grad == True:
             params_to_update.append(param)
 
-    print("Updating {} parameters".format(len(params_to_update)))
-
     if use_cuda:
         model.cuda()
 

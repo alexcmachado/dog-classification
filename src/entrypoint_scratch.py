@@ -110,8 +110,6 @@ def main(
 
     params_to_update = model.parameters()
 
-    print("Updating {} parameters".format(len(params_to_update)))
-
     if use_cuda:
         model.cuda()
 
