@@ -2,14 +2,12 @@ import argparse
 import json
 import os
 import torch
-from torchsummary import summary
-import torchvision.models as models
 import timeit
-import math
 
-from model_scratch import Net
 from train import train
 from loaders import get_loaders
+from model_transfer import get_model
+from crit_opt import get_loss_opt
 
 
 def model_fn(model_dir):
@@ -19,8 +17,7 @@ def model_fn(model_dir):
     # Determine the device and construct the model.
     use_cuda = torch.cuda.is_available()
 
-    model = models.vgg11(pretrained=True)
-    model.classifier[6] = torch.nn.Linear(4096, 133, bias=True)
+    model = get_model()
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, "model.pth")
@@ -46,18 +43,9 @@ def main(
     test_dir,
     flip_prob,
     degrees,
-    input_dim,
-    conv1_out_dim,
-    conv2_out_dim,
-    conv3_out_dim,
-    conv_kernel_size,
-    pool_kernel_size,
-    drop_prob,
-    output_dim,
     model_dir,
     epochs,
     use_cuda,
-    use_transfer,
 ):
 
     print("Use cuda: {}.".format(use_cuda))
@@ -78,61 +66,28 @@ def main(
         test_dir,
     )
 
-    hidden_dim = conv3_out_dim * (math.floor(crop_size / pool_kernel_size ** 3)) ** 2
-
     # Build the model.
-    if use_transfer:
-        model = models.vgg11(pretrained=True)
-        for param in model.features.parameters():
-            param.requires_grad = False
+    model = get_model()
 
-        params_to_update = []
-        for name, param in model.named_parameters():
-            if param.requires_grad == True:
-                params_to_update.append(param)
-
-        model.classifier[6] = torch.nn.Linear(4096, output_dim, bias=True)
-
-    else:
-        model = Net(
-            input_dim=input_dim,
-            conv1_out_dim=conv1_out_dim,
-            conv2_out_dim=conv2_out_dim,
-            conv3_out_dim=conv3_out_dim,
-            conv_kernel_size=conv_kernel_size,
-            pool_kernel_size=pool_kernel_size,
-            hidden_dim=hidden_dim,
-            drop_prob=drop_prob,
-            output_dim=output_dim,
-        )
-
-        params_to_update = model.parameters()
+    params_to_update = []
+    for name, param in model.named_parameters():
+        if param.requires_grad == True:
+            params_to_update.append(param)
 
     if use_cuda:
         model.cuda()
-        device = "cuda"
-    else:
-        device = "cpu"
-
-    summary(
-        model,
-        input_size=(input_dim, crop_size, crop_size),
-        device=device,
-        batch_size=batch_size,
-    )
 
     print("Model loaded")
 
     # Train the model.
-    optimizer = torch.optim.SGD(params_to_update, lr=0.001, momentum=0.9)
 
-    loss_fn = torch.nn.CrossEntropyLoss()
+    criterion, optimizer = get_loss_opt(params_to_update)
 
     model_path = os.path.join(model_dir, "model.pth")
 
     start_time = timeit.default_timer()
 
-    model = train(epochs, loaders, model, optimizer, loss_fn, use_cuda, model_path)
+    model = train(epochs, loaders, model, optimizer, criterion, use_cuda, model_path)
 
     end_time = timeit.default_timer()
     t_sec = end_time - start_time
@@ -144,7 +99,7 @@ def main(
         )
     )
 
-    return model, loaders, optimizer, loss_fn
+    return model, loaders, optimizer, criterion
 
 
 if __name__ == "__main__":
@@ -186,62 +141,6 @@ if __name__ == "__main__":
 
     # Model Parameters
     parser.add_argument(
-        "--input-dim",
-        type=int,
-        default=3,
-        metavar="N",
-        help="size of the input dimension (default: 3)",
-    )
-    parser.add_argument(
-        "--conv1-out-dim",
-        type=int,
-        default=8,
-        metavar="N",
-        help="size of the convolutional layer output dimension (default: 32)",
-    )
-    parser.add_argument(
-        "--conv2-out-dim",
-        type=int,
-        default=16,
-        metavar="N",
-        help="size of the convolutional layer output dimension (default: 32)",
-    )
-    parser.add_argument(
-        "--conv3-out-dim",
-        type=int,
-        default=32,
-        metavar="N",
-        help="size of the convolutional layer output dimension (default: 32)",
-    )
-    parser.add_argument(
-        "--conv-kernel-size",
-        type=int,
-        default=3,
-        metavar="N",
-        help="size of the convolutional layer kernel (default: 3)",
-    )
-    parser.add_argument(
-        "--pool-kernel-size",
-        type=int,
-        default=2,
-        metavar="N",
-        help="size of the pooling layer kernel (default: 3)",
-    )
-    parser.add_argument(
-        "--drop-prob",
-        type=float,
-        default=0.5,
-        metavar="N",
-        help="Drop probability (default: 0.5)",
-    )
-    parser.add_argument(
-        "--output-dim",
-        type=int,
-        default=133,
-        metavar="N",
-        help="size of the output dimension (default: 133)",
-    )
-    parser.add_argument(
         "--flip-prob",
         type=float,
         default=0.5,
@@ -254,13 +153,6 @@ if __name__ == "__main__":
         default=30,
         metavar="N",
         help="Rotation in degrees (default: 30)",
-    )
-    parser.add_argument(
-        "--use-transfer",
-        type=bool,
-        default=False,
-        metavar="N",
-        help="Use transfer learning (default: False)",
     )
 
     # SageMaker Parameters
@@ -296,16 +188,7 @@ if __name__ == "__main__":
         args.test_dir,
         args.flip_prob,
         args.degrees,
-        args.input_dim,
-        args.conv1_out_dim,
-        args.conv2_out_dim,
-        args.conv3_out_dim,
-        args.conv_kernel_size,
-        args.pool_kernel_size,
-        args.drop_prob,
-        args.output_dim,
         args.model_dir,
         args.epochs,
         use_cuda,
-        args.use_transfer,
     )
