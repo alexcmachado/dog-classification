@@ -84,7 +84,7 @@
 
     \subsection{Metrics}
 
-    The metric to evaluate the quality of the classifier is the accuracy of the dog breed predictions. The accuracy can be used in this case because the training data is not imbalanced. The definition of predicition accuracy is as follows:
+    The metric to evaluate the quality of the classifier is the accuracy of the dog breed predictions. The accuracy can be used in this case because the training data is not imbalanced. The definition of prediction accuracy is as follows:
 
     \[Accuracy = \frac{TP + TN}{TP +  TN + FP + FN} \]
 
@@ -94,7 +94,7 @@
 
     \subsection{Data Exploration}
 
-    There are two datasets for this project: one is a dog dataset containing 8351 images of 133 different dog breeds, and the other is a human dataset consisting of 13233 photos of 5749 different people. The dog dataset is divided in train, validation and test datasets.
+    There are two datasets for this project: one is a dog dataset containing 8351 images of 133 different dog breeds, and the other is a human dataset consisting of 13233 photos of 5749 different people. The dog dataset is divided in train, validation, and test datasets.
 
     A sample of the dog dataset is presented in the Figure \ref*{fig:dog_sample}.
 
@@ -145,7 +145,7 @@
 
     \subsection{Data Preprocessing}
 
-    Since the images have different sizes, it was necessary to resize them. They were resized to 256 pixels and cropped to square shapes of 224x224 pixels about the center and transformed into tensor, then the resulting tensors were normalized. A code snipped is presented on Figure \ref*{fig:transform_train_test}
+    Since the images have all different sizes, it was necessary to resize them. The images on the validation and testing datasets were resized to 256 pixels and cropped to square shapes of 224x224 pixels about the center and transformed into tensors, then the resulting tensors were normalized. A code snippet is presented on Figure \ref*{fig:transform_train_test}.
 
     \begin{figure}[htbp]
         \centering
@@ -154,7 +154,7 @@
         \label{fig:transform_train_test}
     \end{figure}
     
-    For the training data, in addition to the steps mentioned above, the images were also randomly rotated and horizontaly flipped. The Figure \ref*{fig:transform_train} presents the code used for this transformation.
+    For the training data, in addition the resizing, cropping and normalization, data augmentation was applied, so the images were also randomly rotated and horizontally flipped. The Figure \ref*{fig:transform_train} presents the code used for this transformation.
     
     \begin{figure}[htbp]
         \centering
@@ -165,7 +165,26 @@
 
     \subsection{Implementation}
 
+    The steps required for this implementation are as follow:
+
+    \begin{itemize}
+        \item Exploration of both the dog and human datasets in order to verify the quality of the data and if any cleaning was necessary.
+        \item Making all the images the same size and normalizing of images.
+        \item Apply data augmentation on training dataset such as random horizontal flip and random rotation.
+        \item Configuration of pretrained human face detector using a pretrained OpenCV algorithm.
+        \item Configuration of pretrained dog detector using a VGG-16 model.
+        \item Design of a Convolutional Neural Network to utilize as benchmark model.
+        \item Training, validating and testing benchmark model.
+        \item Change a pretrained VGG-11 model to output 133 classes, which is the number of dog breeds on the training dataset.
+        \item Train this model using the dog dataset to improve its accuracy.
+        \item Test the new model and verify final accuracy.
+        \item Write an algorithm that receives an image and, using the models described above, verify if it is that of a dog or a human.
+        \item Predict which dog breed is in the image or with which dog breed the human in the picture looks like.
+    \end{itemize}
+
     \subsection{Refinement}
+
+    When using transfer learning with the VGG-11 pretrained model, at first it only reached 46\% of accuracy. Even trying to change the hyperparameters and batch size would make no difference on the final accuracy. What really made it reach 86\% was shuffling the training data before feeding it to the model.
 
     \section{Results}
 
@@ -225,7 +244,7 @@
 
     \subsection{Justification}
 
-    The Table \ref*{tab:results_comparison} presents a comparision between the results obtained for the proposed model and the benchmark model.
+    The Table \ref*{tab:results_comparison} presents a comparison between the results obtained for the proposed model and the benchmark model.
 
     \begin{table}[htbp]
         \centering
@@ -245,9 +264,11 @@
 
     \section{Conclusion}
 
-    \subsection{Free-Form Visualization}
-
     \subsection{Reflection}
+
+    This project was very important for me to understand the different steps of creating a machine learning model. From data exploration, to preprocessing, training, and testing, all the steps were included in this project.
+
+    The most difficulty I had was making the configuration of the Convolutional Neural Network for the Python program to run correctly without any exceptions being raised.
 
     \subsection{Improvement}
 
