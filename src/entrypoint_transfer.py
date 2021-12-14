@@ -3,6 +3,9 @@ import json
 import os
 import torch
 import timeit
+from PIL import Image
+import io
+import torchvision.transforms as transforms
 
 from train import train
 from loaders import get_loaders
@@ -39,6 +42,41 @@ def model_fn(model_dir):
 
     print("Done loading model.")
     return model
+
+
+def input_fn(input_data, content_type):
+
+    img = Image.open(io.BytesIO(bytes(input_data)))
+
+    transform = transforms.Compose(
+        [
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
+
+    img_t = transform(img)
+    batch_t = img_t.unsqueeze(0)
+
+    return batch_t
+
+
+def predict_fn(data, model):
+    """A default predict_fn for PyTorch. Calls a model on data deserialized in input_fn.
+    Runs prediction on GPU if cuda is available.
+
+    Args:
+        data: input data (torch.Tensor) for prediction deserialized by input_fn
+        model: PyTorch model loaded in memory by model_fn
+
+    Returns: a prediction
+    """
+    out = model(data)
+    index = out.argmax()
+
+    return index
 
 
 def main(
