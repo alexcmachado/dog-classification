@@ -6,6 +6,7 @@ import timeit
 from PIL import Image
 import io
 import torchvision.transforms as transforms
+import base64
 
 from train import train
 from loaders import get_loaders
@@ -46,7 +47,9 @@ def model_fn(model_dir):
 
 def input_fn(input_data, content_type):
 
-    img = Image.open(io.BytesIO(bytes(input_data)))
+    data = base64.b85decode(input_data)
+
+    img = Image.open(io.BytesIO(data))
 
     transform = transforms.Compose(
         [
