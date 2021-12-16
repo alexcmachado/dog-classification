@@ -1,6 +1,16 @@
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torchvision import datasets
+import io
+import base64
+
+
+def transform_test(img):
+    img_bytes = io.BytesIO()
+    img.save(img_bytes, format="JPEG")
+    img_bytes = img_bytes.getvalue()
+    img_str = base64.b85encode(img_bytes).decode("utf-8")
+    return img_str
 
 
 def get_loaders(
@@ -18,7 +28,7 @@ def get_loaders(
         ]
     )
 
-    transform_valid_test = transforms.Compose(
+    transform_valid = transforms.Compose(
         [
             transforms.Resize(resize),
             transforms.CenterCrop(crop_size),
@@ -28,17 +38,17 @@ def get_loaders(
     )
 
     train_dataset = datasets.ImageFolder(train_dir, transform=transform_train)
-    valid_dataset = datasets.ImageFolder(valid_dir, transform=transform_valid_test)
-    test_dataset = datasets.ImageFolder(test_dir, transform=transform_valid_test)
+    valid_dataset = datasets.ImageFolder(valid_dir, transform=transform_valid)
+    test_dataset = datasets.ImageFolder(test_dir, transform=transform_test)
 
-    train_dataset_batch = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    valid_dataset_batch = DataLoader(valid_dataset, batch_size=batch_size)
-    test_dataset_batch = DataLoader(test_dataset, batch_size=batch_size)
+    loader_train = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    loader_valid = DataLoader(valid_dataset, batch_size=batch_size)
+    loader_test = DataLoader(test_dataset)
 
     loaders = {
-        "train": train_dataset_batch,
-        "valid": valid_dataset_batch,
-        "test": test_dataset_batch,
+        "train": loader_train,
+        "valid": loader_valid,
+        "test": loader_test,
     }
 
     return loaders
