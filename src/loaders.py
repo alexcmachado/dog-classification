@@ -9,7 +9,7 @@ def transform_test(img):
     img_bytes = io.BytesIO()
     img.save(img_bytes, format="JPEG")
     img_bytes = img_bytes.getvalue()
-    img_str = base64.b85encode(img_bytes).decode("utf-8")
+    img_str = base64.b64encode(img_bytes).decode("utf-8")
     return img_str
 
 

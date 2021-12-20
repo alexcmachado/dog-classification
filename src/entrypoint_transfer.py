@@ -47,7 +47,7 @@ def model_fn(model_dir):
 
 def input_fn(input_data, content_type):
 
-    data = base64.b85decode(input_data)
+    data = base64.b64decode(input_data)
 
     img = Image.open(io.BytesIO(data))
 
