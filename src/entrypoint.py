@@ -146,6 +146,12 @@ if __name__ == "__main__":
         metavar="N",
         help="number of epochs to train (default: 5)",
     )
+    parser.add_argument(
+        "--use-cuda",
+        type=bool,
+        default=torch.cuda.is_available(),
+        help="use GPU Accelerated Computing",
+    )
 
     # Model Parameters
     parser.add_argument(
@@ -170,8 +176,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    use_cuda = torch.cuda.is_available()
-
     main(
         args.seed,
         args.epochs,
@@ -179,5 +183,5 @@ if __name__ == "__main__":
         args.train_dir,
         args.valid_dir,
         args.model_dir,
-        use_cuda,
+        args.use_cuda,
     )
