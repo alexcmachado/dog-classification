@@ -3,7 +3,6 @@ import json
 import os
 import torch
 import timeit
-import math
 from PIL import Image
 import io
 import torchvision.transforms as transforms
@@ -30,17 +29,7 @@ def model_fn(model_dir):
     # Determine the device and construct the model.
     use_cuda = torch.cuda.is_available()
 
-    model = Net(
-        input_dim=model_info["input_dim"],
-        conv1_out_dim=model_info["conv1_out_dim"],
-        conv2_out_dim=model_info["conv2_out_dim"],
-        conv3_out_dim=model_info["conv3_out_dim"],
-        conv_kernel_size=model_info["conv_kernel_size"],
-        pool_kernel_size=model_info["pool_kernel_size"],
-        hidden_dim=model_info["hidden_dim"],
-        drop_prob=model_info["drop_prob"],
-        output_dim=model_info["output_dim"],
-    )
+    model = Net()
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, "model.pth")
@@ -103,14 +92,6 @@ def main(
     test_dir,
     flip_prob,
     degrees,
-    input_dim,
-    conv1_out_dim,
-    conv2_out_dim,
-    conv3_out_dim,
-    conv_kernel_size,
-    pool_kernel_size,
-    drop_prob,
-    output_dim,
     model_dir,
     epochs,
     use_cuda,
@@ -134,20 +115,8 @@ def main(
         test_dir,
     )
 
-    hidden_dim = conv3_out_dim * (math.floor(crop_size / pool_kernel_size ** 3)) ** 2
-
     # Build the model.
-    model = Net(
-        input_dim=input_dim,
-        conv1_out_dim=conv1_out_dim,
-        conv2_out_dim=conv2_out_dim,
-        conv3_out_dim=conv3_out_dim,
-        conv_kernel_size=conv_kernel_size,
-        pool_kernel_size=pool_kernel_size,
-        hidden_dim=hidden_dim,
-        drop_prob=drop_prob,
-        output_dim=output_dim,
-    )
+    model = Net()
 
     params_to_update = model.parameters()
 
@@ -177,17 +146,7 @@ def main(
 
     model_info_path = os.path.join(model_dir, "model_info.pth")
     with open(model_info_path, "wb") as f:
-        model_info = {
-            "input_dim": input_dim,
-            "conv1_out_dim": conv1_out_dim,
-            "conv2_out_dim": conv2_out_dim,
-            "conv3_out_dim": conv3_out_dim,
-            "conv_kernel_size": conv_kernel_size,
-            "pool_kernel_size": pool_kernel_size,
-            "hidden_dim": hidden_dim,
-            "drop_prob": drop_prob,
-            "output_dim": output_dim,
-        }
+        model_info = {}
         torch.save(model_info, f)
 
 
@@ -229,62 +188,6 @@ if __name__ == "__main__":
     )
 
     # Model Parameters
-    parser.add_argument(
-        "--input-dim",
-        type=int,
-        default=3,
-        metavar="N",
-        help="size of the input dimension (default: 3)",
-    )
-    parser.add_argument(
-        "--conv1-out-dim",
-        type=int,
-        default=8,
-        metavar="N",
-        help="size of the convolutional layer output dimension (default: 32)",
-    )
-    parser.add_argument(
-        "--conv2-out-dim",
-        type=int,
-        default=16,
-        metavar="N",
-        help="size of the convolutional layer output dimension (default: 32)",
-    )
-    parser.add_argument(
-        "--conv3-out-dim",
-        type=int,
-        default=32,
-        metavar="N",
-        help="size of the convolutional layer output dimension (default: 32)",
-    )
-    parser.add_argument(
-        "--conv-kernel-size",
-        type=int,
-        default=3,
-        metavar="N",
-        help="size of the convolutional layer kernel (default: 3)",
-    )
-    parser.add_argument(
-        "--pool-kernel-size",
-        type=int,
-        default=2,
-        metavar="N",
-        help="size of the pooling layer kernel (default: 2)",
-    )
-    parser.add_argument(
-        "--drop-prob",
-        type=float,
-        default=0.5,
-        metavar="N",
-        help="Drop probability (default: 0.5)",
-    )
-    parser.add_argument(
-        "--output-dim",
-        type=int,
-        default=133,
-        metavar="N",
-        help="size of the output dimension (default: 133)",
-    )
     parser.add_argument(
         "--flip-prob",
         type=float,
@@ -333,14 +236,6 @@ if __name__ == "__main__":
         args.test_dir,
         args.flip_prob,
         args.degrees,
-        args.input_dim,
-        args.conv1_out_dim,
-        args.conv2_out_dim,
-        args.conv3_out_dim,
-        args.conv_kernel_size,
-        args.pool_kernel_size,
-        args.drop_prob,
-        args.output_dim,
         args.model_dir,
         args.epochs,
         use_cuda,
