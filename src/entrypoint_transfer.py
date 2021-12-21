@@ -29,7 +29,7 @@ def model_fn(model_dir):
     # Determine the device and construct the model.
     use_cuda = torch.cuda.is_available()
 
-    model = get_model(output_dim=model_info["output_dim"])
+    model = get_model()
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, "model.pth")
@@ -82,7 +82,7 @@ def predict_fn(data, model):
     return index
 
 
-def main(seed, epochs, train_dir, valid_dir, test_dir, output_dim, model_dir, use_cuda):
+def main(seed, epochs, train_dir, valid_dir, test_dir, model_dir, use_cuda):
 
     print("Use cuda: {}.".format(use_cuda))
 
@@ -94,7 +94,7 @@ def main(seed, epochs, train_dir, valid_dir, test_dir, output_dim, model_dir, us
     loaders = get_loaders(train_dir, valid_dir, test_dir)
 
     # Build the model.
-    model = get_model(output_dim)
+    model = get_model()
 
     params_to_update = []
     for name, param in model.named_parameters():
@@ -127,7 +127,7 @@ def main(seed, epochs, train_dir, valid_dir, test_dir, output_dim, model_dir, us
 
     model_info_path = os.path.join(model_dir, "model_info.pth")
     with open(model_info_path, "wb") as f:
-        model_info = {"output_dim": output_dim}
+        model_info = {}
         torch.save(model_info, f)
 
 
@@ -148,13 +148,6 @@ if __name__ == "__main__":
     )
 
     # Model Parameters
-    parser.add_argument(
-        "--output-dim",
-        type=int,
-        default=133,
-        metavar="N",
-        help="size of the output dimension (default: 133)",
-    )
 
     # SageMaker Parameters
     parser.add_argument(
@@ -185,7 +178,6 @@ if __name__ == "__main__":
         args.train_dir,
         args.valid_dir,
         args.test_dir,
-        args.output_dim,
         args.model_dir,
         use_cuda,
     )
