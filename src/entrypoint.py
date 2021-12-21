@@ -81,9 +81,7 @@ def predict_fn(data, model):
     return index
 
 
-def main(
-    seed, epochs, use_transfer, train_dir, valid_dir, test_dir, model_dir, use_cuda
-):
+def main(seed, epochs, use_transfer, train_dir, valid_dir, model_dir, use_cuda):
 
     print("Use cuda: {}.".format(use_cuda))
 
@@ -92,7 +90,7 @@ def main(
     torch.backends.cudnn.benchmark = False
 
     # Load the training data.
-    loaders = get_loaders(train_dir, valid_dir, test_dir)
+    loaders = get_loaders(train_dir, valid_dir)
 
     # Build the model.
     model = get_model(use_transfer)
@@ -168,9 +166,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--valid-dir", type=str, default=os.environ["SM_CHANNEL_VALIDATION"]
     )
-    parser.add_argument(
-        "--test-dir", type=str, default=os.environ["SM_CHANNEL_TESTING"]
-    )
     parser.add_argument("--num-gpus", type=int, default=os.environ["SM_NUM_GPUS"])
 
     args = parser.parse_args()
@@ -183,7 +178,6 @@ if __name__ == "__main__":
         args.use_transfer,
         args.train_dir,
         args.valid_dir,
-        args.test_dir,
         args.model_dir,
         use_cuda,
     )
