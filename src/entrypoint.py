@@ -11,7 +11,6 @@ import base64
 from train import train
 from loaders import get_loaders
 from model import get_model
-from crit_opt import get_loss_opt
 
 
 def model_fn(model_dir):
@@ -109,7 +108,8 @@ def main(
     print("Model loaded")
 
     # Train the model.
-    criterion, optimizer = get_loss_opt(params_to_update)
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(params_to_update, lr=0.001, momentum=0.9)
 
     model_path = os.path.join(model_dir, "model.pth")
 
