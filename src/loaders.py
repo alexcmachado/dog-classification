@@ -13,16 +13,14 @@ def transform_test(img):
     return img_str
 
 
-def get_loaders(
-    resize, crop_size, degrees, flip_prob, batch_size, train_dir, valid_dir, test_dir
-):
+def get_loaders(train_dir, valid_dir, test_dir):
     print("Get train data loader.")
 
     transform_train = transforms.Compose(
         [
-            transforms.RandomRotation(degrees),
-            transforms.RandomResizedCrop(crop_size),
-            transforms.RandomHorizontalFlip(flip_prob),
+            transforms.RandomRotation(30),
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
@@ -30,8 +28,8 @@ def get_loaders(
 
     transform_valid = transforms.Compose(
         [
-            transforms.Resize(resize),
-            transforms.CenterCrop(crop_size),
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
@@ -41,8 +39,8 @@ def get_loaders(
     valid_dataset = datasets.ImageFolder(valid_dir, transform=transform_valid)
     test_dataset = datasets.ImageFolder(test_dir, transform=transform_test)
 
-    loader_train = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    loader_valid = DataLoader(valid_dataset, batch_size=batch_size)
+    loader_train = DataLoader(train_dataset, batch_size=20, shuffle=True)
+    loader_valid = DataLoader(valid_dataset, batch_size=20)
     loader_test = DataLoader(test_dataset)
 
     loaders = {

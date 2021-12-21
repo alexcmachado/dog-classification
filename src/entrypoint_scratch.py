@@ -8,9 +8,9 @@ import io
 import torchvision.transforms as transforms
 import base64
 
-from model_scratch import Net
 from train import train
 from loaders import get_loaders
+from model_scratch import Net
 from crit_opt import get_loss_opt
 
 
@@ -82,20 +82,7 @@ def predict_fn(data, model):
     return index
 
 
-def main(
-    seed,
-    resize,
-    crop_size,
-    batch_size,
-    train_dir,
-    valid_dir,
-    test_dir,
-    flip_prob,
-    degrees,
-    model_dir,
-    epochs,
-    use_cuda,
-):
+def main(seed, epochs, train_dir, valid_dir, test_dir, model_dir, use_cuda):
 
     print("Use cuda: {}.".format(use_cuda))
 
@@ -104,16 +91,7 @@ def main(
     torch.backends.cudnn.benchmark = False
 
     # Load the training data.
-    loaders = get_loaders(
-        resize,
-        crop_size,
-        degrees,
-        flip_prob,
-        batch_size,
-        train_dir,
-        valid_dir,
-        test_dir,
-    )
+    loaders = get_loaders(train_dir, valid_dir, test_dir)
 
     # Build the model.
     model = Net()
@@ -156,25 +134,7 @@ if __name__ == "__main__":
 
     # Training Parameters
     parser.add_argument(
-        "--resize",
-        type=int,
-        default=64,
-        metavar="N",
-        help="size after resize in px (default: 64)",
-    )
-    parser.add_argument(
-        "--crop-size",
-        type=int,
-        default=64,
-        metavar="N",
-        help="size after crop (default: 64)",
-    )
-    parser.add_argument(
-        "--batch-size",
-        type=int,
-        default=20,
-        metavar="N",
-        help="input batch size for training (default: 20)",
+        "--seed", type=int, default=0, metavar="S", help="random seed (default: 0)"
     )
     parser.add_argument(
         "--epochs",
@@ -183,25 +143,8 @@ if __name__ == "__main__":
         metavar="N",
         help="number of epochs to train (default: 5)",
     )
-    parser.add_argument(
-        "--seed", type=int, default=0, metavar="S", help="random seed (default: 0)"
-    )
 
     # Model Parameters
-    parser.add_argument(
-        "--flip-prob",
-        type=float,
-        default=0.5,
-        metavar="N",
-        help="Flip probability (default: 0.5)",
-    )
-    parser.add_argument(
-        "--degrees",
-        type=float,
-        default=30,
-        metavar="N",
-        help="Rotation in degrees (default: 30)",
-    )
 
     # SageMaker Parameters
     parser.add_argument(
@@ -228,15 +171,10 @@ if __name__ == "__main__":
 
     main(
         args.seed,
-        args.resize,
-        args.crop_size,
-        args.batch_size,
+        args.epochs,
         args.train_dir,
         args.valid_dir,
         args.test_dir,
-        args.flip_prob,
-        args.degrees,
         args.model_dir,
-        args.epochs,
         use_cuda,
     )

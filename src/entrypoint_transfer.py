@@ -82,21 +82,7 @@ def predict_fn(data, model):
     return index
 
 
-def main(
-    seed,
-    resize,
-    crop_size,
-    batch_size,
-    train_dir,
-    valid_dir,
-    test_dir,
-    flip_prob,
-    degrees,
-    output_dim,
-    model_dir,
-    epochs,
-    use_cuda,
-):
+def main(seed, epochs, train_dir, valid_dir, test_dir, output_dim, model_dir, use_cuda):
 
     print("Use cuda: {}.".format(use_cuda))
 
@@ -105,16 +91,7 @@ def main(
     torch.backends.cudnn.benchmark = False
 
     # Load the training data.
-    loaders = get_loaders(
-        resize,
-        crop_size,
-        degrees,
-        flip_prob,
-        batch_size,
-        train_dir,
-        valid_dir,
-        test_dir,
-    )
+    loaders = get_loaders(train_dir, valid_dir, test_dir)
 
     # Build the model.
     model = get_model(output_dim)
@@ -130,7 +107,6 @@ def main(
     print("Model loaded")
 
     # Train the model.
-
     criterion, optimizer = get_loss_opt(params_to_update)
 
     model_path = os.path.join(model_dir, "model.pth")
@@ -151,9 +127,7 @@ def main(
 
     model_info_path = os.path.join(model_dir, "model_info.pth")
     with open(model_info_path, "wb") as f:
-        model_info = {
-            "output_dim": output_dim,
-        }
+        model_info = {"output_dim": output_dim}
         torch.save(model_info, f)
 
 
@@ -163,25 +137,7 @@ if __name__ == "__main__":
 
     # Training Parameters
     parser.add_argument(
-        "--resize",
-        type=int,
-        default=64,
-        metavar="N",
-        help="size after resize in px (default: 64)",
-    )
-    parser.add_argument(
-        "--crop-size",
-        type=int,
-        default=64,
-        metavar="N",
-        help="size after crop (default: 64)",
-    )
-    parser.add_argument(
-        "--batch-size",
-        type=int,
-        default=32,
-        metavar="N",
-        help="input batch size for training (default: 32)",
+        "--seed", type=int, default=0, metavar="S", help="random seed (default: 0)"
     )
     parser.add_argument(
         "--epochs",
@@ -189,9 +145,6 @@ if __name__ == "__main__":
         default=5,
         metavar="N",
         help="number of epochs to train (default: 5)",
-    )
-    parser.add_argument(
-        "--seed", type=int, default=0, metavar="S", help="random seed (default: 0)"
     )
 
     # Model Parameters
@@ -201,20 +154,6 @@ if __name__ == "__main__":
         default=133,
         metavar="N",
         help="size of the output dimension (default: 133)",
-    )
-    parser.add_argument(
-        "--flip-prob",
-        type=float,
-        default=0.5,
-        metavar="N",
-        help="Flip probability (default: 0.5)",
-    )
-    parser.add_argument(
-        "--degrees",
-        type=float,
-        default=30,
-        metavar="N",
-        help="Rotation in degrees (default: 30)",
     )
 
     # SageMaker Parameters
@@ -242,16 +181,11 @@ if __name__ == "__main__":
 
     main(
         args.seed,
-        args.resize,
-        args.crop_size,
-        args.batch_size,
+        args.epochs,
         args.train_dir,
         args.valid_dir,
         args.test_dir,
-        args.flip_prob,
-        args.degrees,
         args.output_dim,
         args.model_dir,
-        args.epochs,
         use_cuda,
     )
