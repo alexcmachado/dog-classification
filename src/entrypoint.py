@@ -10,7 +10,7 @@ import base64
 
 from train import train
 from loaders import get_loaders
-from model_scratch import Net
+from model import get_model
 from crit_opt import get_loss_opt
 
 
@@ -29,7 +29,7 @@ def model_fn(model_dir):
     # Determine the device and construct the model.
     use_cuda = torch.cuda.is_available()
 
-    model = Net()
+    model = get_model(model_info["use_transfer"])
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, "model.pth")
@@ -82,7 +82,9 @@ def predict_fn(data, model):
     return index
 
 
-def main(seed, epochs, train_dir, valid_dir, test_dir, model_dir, use_cuda):
+def main(
+    seed, epochs, use_transfer, train_dir, valid_dir, test_dir, model_dir, use_cuda
+):
 
     print("Use cuda: {}.".format(use_cuda))
 
@@ -94,9 +96,12 @@ def main(seed, epochs, train_dir, valid_dir, test_dir, model_dir, use_cuda):
     loaders = get_loaders(train_dir, valid_dir, test_dir)
 
     # Build the model.
-    model = Net()
+    model = get_model(use_transfer)
 
-    params_to_update = model.parameters()
+    params_to_update = []
+    for name, param in model.named_parameters():
+        if param.requires_grad == True:
+            params_to_update.append(param)
 
     if use_cuda:
         model.cuda()
@@ -124,7 +129,7 @@ def main(seed, epochs, train_dir, valid_dir, test_dir, model_dir, use_cuda):
 
     model_info_path = os.path.join(model_dir, "model_info.pth")
     with open(model_info_path, "wb") as f:
-        model_info = {}
+        model_info = {"use_transfer": use_transfer}
         torch.save(model_info, f)
 
 
@@ -145,6 +150,9 @@ if __name__ == "__main__":
     )
 
     # Model Parameters
+    parser.add_argument(
+        "--use-transfer", type=bool, default=False, help="use transfer learning"
+    )
 
     # SageMaker Parameters
     parser.add_argument(
@@ -172,6 +180,7 @@ if __name__ == "__main__":
     main(
         args.seed,
         args.epochs,
+        args.use_transfer,
         args.train_dir,
         args.valid_dir,
         args.test_dir,

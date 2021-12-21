@@ -1,3 +1,4 @@
+import torchvision.models as models
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -27,3 +28,18 @@ class Net(nn.Module):
         x = self.dropout(x)
         x = self.fc1(x)
         return x
+
+
+def get_model(use_transfer):
+    if use_transfer:
+        model = models.vgg11(pretrained=True)
+
+        for param in model.features.parameters():
+            param.requires_grad = False
+
+        model.classifier[6] = nn.Linear(4096, 133, bias=True)
+
+    else:
+        model = Net()
+
+    return model
