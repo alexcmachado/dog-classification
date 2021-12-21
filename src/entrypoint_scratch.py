@@ -172,9 +172,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--batch-size",
         type=int,
-        default=32,
+        default=20,
         metavar="N",
-        help="input batch size for training (default: 32)",
+        help="input batch size for training (default: 20)",
     )
     parser.add_argument(
         "--epochs",
