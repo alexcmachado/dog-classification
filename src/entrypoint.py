@@ -62,6 +62,11 @@ def input_fn(input_data, content_type):
     img_t = transform(img)
     batch_t = img_t.unsqueeze(0)
 
+    use_cuda = torch.cuda.is_available()
+
+    if use_cuda:
+        batch_t = batch_t.cuda()
+
     return batch_t
 
 
