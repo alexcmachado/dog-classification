@@ -142,9 +142,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--epochs",
         type=int,
-        default=5,
+        default=2,
         metavar="N",
-        help="number of epochs to train (default: 5)",
+        help="number of epochs to train (default: 2)",
     )
     parser.add_argument(
         "--use-cuda",
