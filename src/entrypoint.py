@@ -164,12 +164,6 @@ if __name__ == "__main__":
     )
 
     # SageMaker Parameters
-    parser.add_argument(
-        "--hosts", type=list, default=json.loads(os.environ["SM_HOSTS"])
-    )
-    parser.add_argument(
-        "--current-host", type=str, default=os.environ["SM_CURRENT_HOST"]
-    )
     parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
     parser.add_argument(
         "--train-dir", type=str, default=os.environ["SM_CHANNEL_TRAINING"]
@@ -177,7 +171,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--valid-dir", type=str, default=os.environ["SM_CHANNEL_VALIDATION"]
     )
-    parser.add_argument("--num-gpus", type=int, default=os.environ["SM_NUM_GPUS"])
 
     args = parser.parse_args()
 
