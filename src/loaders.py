@@ -1,11 +1,12 @@
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torchvision import datasets
+from typing import Dict
 
 BATCH_SIZE = 20
 
 
-def get_loaders(train_dir, valid_dir):
+def get_loaders(train_dir: str, valid_dir: str) -> Dict[str, DataLoader]:
     print("Get train data loader.")
 
     transform_train = transforms.Compose(

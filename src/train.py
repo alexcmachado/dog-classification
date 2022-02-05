@@ -1,12 +1,25 @@
 import torch
 import numpy as np
+from torchvision.models import VGG
+from torch.nn import CrossEntropyLoss
+from torch.optim.optimizer import Optimizer
+from typing import Dict
+from torch.utils.data import DataLoader
 
 from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-def train(n_epochs, loaders, model, optimizer, criterion, use_cuda, save_path):
+def train(
+    n_epochs: int,
+    loaders: Dict[str, DataLoader],
+    model: VGG,
+    optimizer: Optimizer,
+    criterion: CrossEntropyLoss,
+    use_cuda: bool,
+    save_path: str,
+) -> VGG:
     """returns trained model"""
 
     valid_loss_min = np.Inf

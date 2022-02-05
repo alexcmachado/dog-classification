@@ -1,11 +1,14 @@
-import argparse
+from argparse import Namespace, ArgumentParser
 import os
 import torch
 import timeit
 from PIL import Image
 import io
 import torchvision.transforms as transforms
+from torchvision.models import VGG
 import base64
+from typing import Union
+from torch import Tensor
 
 from train import train
 from loaders import get_loaders
@@ -13,7 +16,7 @@ from model import get_model
 
 
 class Configs:
-    def __init__(self, args):
+    def __init__(self, args: Namespace):
         self.seed = args.seed
         self.epochs = args.epochs
         self.train_dir = args.train_dir
@@ -22,7 +25,7 @@ class Configs:
         self.use_cuda = args.use_cuda
 
 
-def model_fn(model_dir):
+def model_fn(model_dir: str) -> VGG:
     """Load the PyTorch model from the `model_dir` directory."""
     print("Loading model.")
 
@@ -45,7 +48,7 @@ def model_fn(model_dir):
     return model
 
 
-def input_fn(input_data, content_type):
+def input_fn(input_data: Union[str, bytearray], content_type: str) -> Tensor:
     if type(input_data) == str:
         input_data = base64.b64decode(input_data)
 
@@ -71,7 +74,7 @@ def input_fn(input_data, content_type):
     return batch_t
 
 
-def predict_fn(data, model):
+def predict_fn(data: Tensor, model: VGG) -> Tensor:
     """A default predict_fn for PyTorch. Calls a model on data deserialized in input_fn.
     Runs prediction on GPU if cuda is available.
 
@@ -88,7 +91,7 @@ def predict_fn(data, model):
 
 
 def parser_cli() -> Configs:
-    parser = argparse.ArgumentParser()
+    parser = ArgumentParser()
 
     # Training Parameters
     parser.add_argument(
