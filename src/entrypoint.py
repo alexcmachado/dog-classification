@@ -16,7 +16,6 @@ class Configs:
     def __init__(self, args):
         self.seed = args.seed
         self.epochs = args.epochs
-        self.use_transfer = args.use_transfer
         self.train_dir = args.train_dir
         self.valid_dir = args.valid_dir
         self.model_dir = args.model_dir
@@ -27,18 +26,10 @@ def model_fn(model_dir):
     """Load the PyTorch model from the `model_dir` directory."""
     print("Loading model.")
 
-    # First, load the parameters used to create the model.
-    model_info = {}
-    model_info_path = os.path.join(model_dir, "model_info.pth")
-    with open(model_info_path, "rb") as f:
-        model_info = torch.load(f)
-
-    print("model_info: {}".format(model_info))
-
     # Determine the device and construct the model.
     use_cuda = torch.cuda.is_available()
 
-    model = get_model(model_info["use_transfer"])
+    model = get_model()
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, "model.pth")
@@ -117,11 +108,6 @@ def parser_cli() -> Configs:
         help="use GPU Accelerated Computing",
     )
 
-    # Model Parameters
-    parser.add_argument(
-        "--use-transfer", type=bool, default=False, help="use transfer learning"
-    )
-
     # SageMaker Parameters
     parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
     parser.add_argument(
@@ -135,13 +121,6 @@ def parser_cli() -> Configs:
     return Configs(args)
 
 
-def write_model_to_disk(path: str, use_transfer: bool) -> None:
-    model_info_path = os.path.join(path, "model_info.pth")
-    with open(model_info_path, "wb") as f:
-        model_info = {"use_transfer": use_transfer}
-        torch.save(model_info, f)
-
-
 def run(configs: Configs) -> None:
     print("Use cuda: {}.".format(configs.use_cuda))
 
@@ -153,7 +132,7 @@ def run(configs: Configs) -> None:
     loaders = get_loaders(configs.train_dir, configs.valid_dir)
 
     # Build the model.
-    model = get_model(configs.use_transfer)
+    model = get_model()
 
     params_to_update = []
     for name, param in model.named_parameters():
@@ -192,7 +171,6 @@ def run(configs: Configs) -> None:
             t_hour, t_min, t_sec
         )
     )
-    write_model_to_disk()
 
 
 def main() -> None:
