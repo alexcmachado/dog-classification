@@ -3,15 +3,12 @@ import os
 import torch
 from PIL import Image
 import io
-import torchvision.transforms as transforms
 from torchvision.models import VGG
 import base64
 from typing import Union
 from torch import Tensor
 
-from train import train
-from loaders import get_loaders
-from model import get_pretrained_model
+from trainer import Trainer
 
 
 def model_fn(model_dir: str) -> VGG:
@@ -29,20 +26,15 @@ def model_fn(model_dir: str) -> VGG:
     # Determine the device and construct the model.
     use_cuda = torch.cuda.is_available()
 
-    model = get_pretrained_model()
+    trainer = Trainer(use_cuda)
 
-    # Load the stored model parameters.
-    model_path = os.path.join(model_dir, "model.pth")
-    with open(model_path, "rb") as f:
-        model.load_state_dict(torch.load(f, map_location=torch.device("cpu")))
+    trainer.get_pretrained_model()
+    trainer.load_model_from_disk(model_dir)
 
-    if use_cuda:
-        model.cuda()
-
-    model.eval()
+    trainer.model.eval()
 
     print("Done loading model.")
-    return model
+    return trainer.model
 
 
 def input_fn(input_data: Union[str, bytearray], content_type: str) -> Tensor:
@@ -62,14 +54,7 @@ def input_fn(input_data: Union[str, bytearray], content_type: str) -> Tensor:
 
     img = Image.open(io.BytesIO(input_data))
 
-    transform = transforms.Compose(
-        [
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ]
-    )
+    transform = Trainer.get_transform()
 
     img_t = transform(img)
     batch_t = img_t.unsqueeze(0)
@@ -104,7 +89,7 @@ def parser_cli() -> Namespace:
     Parse command-line arguments and create Configs instance.
 
     Returns:
-      Configs: Configurations used for training.
+      Namespace: Configurations used for training.
     """
     parser = ArgumentParser()
 
@@ -141,7 +126,7 @@ def parser_cli() -> Namespace:
 
 def run(configs: Namespace) -> None:
     """
-    Create loaders, model, criterion and optimizer, and train the model.
+    Train model using Trainer class and save to disk.
 
     Args:
       configs (Configs): Configurations used for training.
@@ -152,35 +137,16 @@ def run(configs: Namespace) -> None:
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-    # Load the training data.
-    loaders = get_loaders(train_dir=configs.train_dir, valid_dir=configs.valid_dir)
-
-    # Build the model.
-    model = get_pretrained_model()
-
-    params_to_update = []
-    for name, param in model.named_parameters():
-        if param.requires_grad:
-            params_to_update.append(param)
-
-    if configs.use_cuda:
-        model.cuda()
-
-    print("Model loaded")
-
-    # Train the model.
-    criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(params=params_to_update, lr=0.001, momentum=0.9)
-
-    train(
-        n_epochs=configs.epochs,
-        loaders=loaders,
-        model=model,
-        optimizer=optimizer,
-        criterion=criterion,
-        use_cuda=configs.use_cuda,
-        model_dir=configs.model_dir,
+    trainer = Trainer(configs.use_cuda)
+    trainer.get_loaders(
+        train_dir=configs.train_dir,
+        valid_dir=configs.valid_dir,
     )
+    trainer.get_pretrained_model()
+    trainer.get_optimizer()
+    trainer.get_criterion()
+
+    trainer.train(n_epochs=configs.epochs, model_dir=configs.model_dir)
 
 
 def main() -> None:
