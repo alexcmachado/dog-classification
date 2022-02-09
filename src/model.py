@@ -2,7 +2,7 @@ from torchvision.models import VGG, vgg11
 from torch.nn import Linear
 
 
-def get_model() -> VGG:
+def get_pretrained_model() -> VGG:
     """
     Download pretrained VGG model and change size of last layer to 133.
 

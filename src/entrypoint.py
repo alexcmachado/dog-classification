@@ -11,7 +11,7 @@ from torch import Tensor
 
 from train import train
 from loaders import get_loaders
-from model import get_model
+from model import get_pretrained_model
 
 
 def model_fn(model_dir: str) -> VGG:
@@ -29,7 +29,7 @@ def model_fn(model_dir: str) -> VGG:
     # Determine the device and construct the model.
     use_cuda = torch.cuda.is_available()
 
-    model = get_model()
+    model = get_pretrained_model()
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, "model.pth")
@@ -156,7 +156,7 @@ def run(configs: Namespace) -> None:
     loaders = get_loaders(train_dir=configs.train_dir, valid_dir=configs.valid_dir)
 
     # Build the model.
-    model = get_model()
+    model = get_pretrained_model()
 
     params_to_update = []
     for name, param in model.named_parameters():
