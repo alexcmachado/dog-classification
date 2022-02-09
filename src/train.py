@@ -12,6 +12,81 @@ from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
+def train_model(
+    model: VGG,
+    loader: DataLoader,
+    optimizer: Optimizer,
+    criterion: CrossEntropyLoss,
+    train_loss: float,
+    use_cuda: bool,
+):
+    """
+    Train the model and calculate loss.
+
+    Args:
+      model (VGG): Model to train.
+      loader (DataLoader): Data loader for train.
+      optimizer (Optimizer): Optimizer to use on training.
+      criterion (CrossEntropyLoss): Criterion to use on training.
+      train_loss (float): Last train loss calculated.
+      use_cuda (bool): Use GPU Accelerated Computing.
+
+    Returns:
+      model (VGG): Trained model.
+      train_loss (float): New train loss.
+    """
+    model.train()
+    for batch_idx, (data, target) in enumerate(loader):
+
+        if use_cuda:
+            data, target = data.cuda(), target.cuda()
+
+        optimizer.zero_grad()
+        outputs = model(data)
+        loss = criterion(outputs, target)
+        loss.backward()
+        optimizer.step()
+
+        train_loss += (1 / (batch_idx + 1)) * (loss.data - train_loss)
+
+    return model, train_loss
+
+
+def validate_model(
+    model: VGG,
+    loader: DataLoader,
+    criterion: CrossEntropyLoss,
+    valid_loss: float,
+    use_cuda: bool,
+):
+    """
+    Validate the model and calculate loss.
+
+    Args:
+      model (VGG): Model to train.
+      loader (DataLoader): Data loader for train.
+      criterion (CrossEntropyLoss): Criterion to use on training.
+      valid_loss (float): Last validation loss calculated.
+      use_cuda (bool): Use GPU Accelerated Computing.
+
+    Returns:
+      model (VGG): Trained model.
+      valid_loss (float): New validation loss.
+    """
+    model.eval()
+    for batch_idx, (data, target) in enumerate(loader):
+
+        if use_cuda:
+            data, target = data.cuda(), target.cuda()
+
+        outputs = model(data)
+        loss = criterion(outputs, target)
+
+        valid_loss += (1 / (batch_idx + 1)) * (loss.data - valid_loss)
+
+    return valid_loss
+
+
 def save_model_to_disk(model_dir: str, model: VGG) -> None:
     """
     Save model to disk.
@@ -53,35 +128,25 @@ def train(
         train_loss = 0.0
         valid_loss = 0.0
 
-        model.train()
-        for batch_idx, (data, target) in enumerate(loaders["train"]):
+        model = train_model(
+            model=model,
+            loader=loaders["train"],
+            optimizer=optimizer,
+            criterion=criterion,
+            train_loss=train_loss,
+            use_cuda=use_cuda,
+        )
 
-            if use_cuda:
-                data, target = data.cuda(), target.cuda()
-
-            optimizer.zero_grad()
-            outputs = model(data)
-            loss = criterion(outputs, target)
-            loss.backward()
-            optimizer.step()
-
-            train_loss += (1 / (batch_idx + 1)) * (loss.data - train_loss)
-
-        model.eval()
-        for batch_idx, (data, target) in enumerate(loaders["valid"]):
-
-            if use_cuda:
-                data, target = data.cuda(), target.cuda()
-
-            outputs = model(data)
-            loss = criterion(outputs, target)
-
-            valid_loss += (1 / (batch_idx + 1)) * (loss.data - valid_loss)
+        validate_model(
+            model=model,
+            loader=loaders["valid"],
+            criterion=criterion,
+            valid_loss=valid_loss,
+            use_cuda=use_cuda,
+        )
 
         print(
-            "Epoch: {} \tTraining Loss: {:.6f} \tValidation Loss: {:.6f}".format(
-                epoch, train_loss, valid_loss
-            )
+            f"Epoch: {epoch} \tTraining Loss: {train_loss:.6f} \tValidation Loss: {valid_loss:.6f}"
         )
 
         if valid_loss < valid_loss_min:
