@@ -1,7 +1,6 @@
 from argparse import Namespace, ArgumentParser
 import os
 import torch
-import timeit
 from PIL import Image
 import io
 import torchvision.transforms as transforms
@@ -153,8 +152,6 @@ def run(configs: Configs) -> None:
 
     model_path = os.path.join(configs.model_dir, "model.pth")
 
-    start_time = timeit.default_timer()
-
     model = train(
         n_epochs=configs.epochs,
         loaders=loaders,
@@ -163,16 +160,6 @@ def run(configs: Configs) -> None:
         criterion=criterion,
         use_cuda=configs.use_cuda,
         save_path=model_path,
-    )
-
-    end_time = timeit.default_timer()
-    t_sec = end_time - start_time
-    (t_min, t_sec) = divmod(t_sec, 60)
-    (t_hour, t_min) = divmod(t_min, 60)
-    print(
-        "Total training time: {:.0f} h, {:.0f} min, {:.0f} sec".format(
-            t_hour, t_min, t_sec
-        )
     )
 
 
