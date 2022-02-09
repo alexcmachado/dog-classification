@@ -132,7 +132,7 @@ def run(configs: Configs) -> None:
     torch.backends.cudnn.benchmark = False
 
     # Load the training data.
-    loaders = get_loaders(configs.train_dir, configs.valid_dir)
+    loaders = get_loaders(train_dir=configs.train_dir, valid_dir=configs.valid_dir)
 
     # Build the model.
     model = get_model()
@@ -149,20 +149,20 @@ def run(configs: Configs) -> None:
 
     # Train the model.
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(params_to_update, lr=0.001, momentum=0.9)
+    optimizer = torch.optim.SGD(params=params_to_update, lr=0.001, momentum=0.9)
 
     model_path = os.path.join(configs.model_dir, "model.pth")
 
     start_time = timeit.default_timer()
 
     model = train(
-        configs.epochs,
-        loaders,
-        model,
-        optimizer,
-        criterion,
-        configs.use_cuda,
-        model_path,
+        n_epochs=configs.epochs,
+        loaders=loaders,
+        model=model,
+        optimizer=optimizer,
+        criterion=criterion,
+        use_cuda=configs.use_cuda,
+        save_path=model_path,
     )
 
     end_time = timeit.default_timer()

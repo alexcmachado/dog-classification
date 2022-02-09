@@ -28,11 +28,15 @@ def get_loaders(train_dir: str, valid_dir: str) -> Dict[str, DataLoader]:
         ]
     )
 
-    train_dataset = datasets.ImageFolder(train_dir, transform=transform_train)
-    valid_dataset = datasets.ImageFolder(valid_dir, transform=transform_valid)
+    train_dataset = datasets.ImageFolder(root=train_dir, transform=transform_train)
+    valid_dataset = datasets.ImageFolder(root=valid_dir, transform=transform_valid)
 
-    loader_train = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    loader_valid = DataLoader(valid_dataset, batch_size=BATCH_SIZE)
+    loader_train = DataLoader(
+        dataset=train_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+    )
+    loader_valid = DataLoader(dataset=valid_dataset, batch_size=BATCH_SIZE)
 
     loaders = {
         "train": loader_train,
