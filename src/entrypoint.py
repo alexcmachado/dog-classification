@@ -14,23 +14,6 @@ from loaders import get_loaders
 from model import get_model
 
 
-class Configs:
-    """
-    Create object with configurations used for training.
-
-    Args:
-      args (Namespace): Arguments passed on command-line.
-    """
-
-    def __init__(self, args: Namespace):
-        self.seed = args.seed
-        self.epochs = args.epochs
-        self.train_dir = args.train_dir
-        self.valid_dir = args.valid_dir
-        self.model_dir = args.model_dir
-        self.use_cuda = args.use_cuda
-
-
 def model_fn(model_dir: str) -> VGG:
     """
     Load the PyTorch model from directory.
@@ -116,7 +99,7 @@ def predict_fn(data: Tensor, model: VGG) -> Tensor:
     return index
 
 
-def parser_cli() -> Configs:
+def parser_cli() -> Namespace:
     """
     Parse command-line arguments and create Configs instance.
 
@@ -153,10 +136,10 @@ def parser_cli() -> Configs:
     )
 
     args = parser.parse_args()
-    return Configs(args)
+    return args
 
 
-def run(configs: Configs) -> None:
+def run(configs: Namespace) -> None:
     """
     Create loaders, model, criterion and optimizer, and train the model.
 
