@@ -15,6 +15,13 @@ from model import get_model
 
 
 class Configs:
+    """
+    Create object with configurations used for training.
+
+    Args:
+      args (Namespace): Arguments passed on command-line.
+    """
+
     def __init__(self, args: Namespace):
         self.seed = args.seed
         self.epochs = args.epochs
@@ -25,7 +32,15 @@ class Configs:
 
 
 def model_fn(model_dir: str) -> VGG:
-    """Load the PyTorch model from the `model_dir` directory."""
+    """
+    Load the PyTorch model from directory.
+
+    Args:
+      model_dir (str): Directory to load model.
+
+    Returns:
+      VGG: Loaded model.
+    """
     print("Loading model.")
 
     # Determine the device and construct the model.
@@ -48,6 +63,17 @@ def model_fn(model_dir: str) -> VGG:
 
 
 def input_fn(input_data: Union[str, bytearray], content_type: str) -> Tensor:
+    """
+    Deserialize input, apply transforms and create batch.
+    Move input to GPU, if available.
+
+    Args:
+      input_data (str | bytearray): Data to be deserialized.
+      content_type (str): Type of input data.
+
+    Returns:
+      Tensor: Tensor with input data.
+    """
     if type(input_data) == str:
         input_data = base64.b64decode(input_data)
 
@@ -74,14 +100,15 @@ def input_fn(input_data: Union[str, bytearray], content_type: str) -> Tensor:
 
 
 def predict_fn(data: Tensor, model: VGG) -> Tensor:
-    """A default predict_fn for PyTorch. Calls a model on data deserialized in input_fn.
-    Runs prediction on GPU if cuda is available.
+    """
+    Call a model on data deserialized in input_fn.
 
     Args:
-        data: input data (torch.Tensor) for prediction deserialized by input_fn
-        model: PyTorch model loaded in memory by model_fn
+      data (Tensor): Input data for prediction deserialized by input_fn.
+      model (VGG): PyTorch model loaded in memory by model_fn.
 
-    Returns: a prediction
+    Returns:
+      Tensor: Predicted class.
     """
     out = model(data)
     index = out.argmax()
@@ -90,6 +117,12 @@ def predict_fn(data: Tensor, model: VGG) -> Tensor:
 
 
 def parser_cli() -> Configs:
+    """
+    Parse command-line arguments and create Configs instance.
+
+    Returns:
+      Configs: Configurations used for training.
+    """
     parser = ArgumentParser()
 
     # Training Parameters
@@ -124,6 +157,12 @@ def parser_cli() -> Configs:
 
 
 def run(configs: Configs) -> None:
+    """
+    Create loaders, model, criterion and optimizer, and train the model.
+
+    Args:
+      configs (Configs): Configurations used for training.
+    """
     print("Use cuda: {}.".format(configs.use_cuda))
 
     torch.manual_seed(configs.seed)

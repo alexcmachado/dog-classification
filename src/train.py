@@ -13,6 +13,13 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 def save_model_to_disk(model_dir: str, model: VGG) -> None:
+    """
+    Save model to disk.
+
+    Args:
+      model_dir (str): Directory to save model.
+      model (VGG): Model to save.
+    """
     save_path = os.path.join(model_dir, "model.pth")
     with open(save_path, "wb") as f:
         torch.save(model.state_dict(), f)
@@ -27,7 +34,18 @@ def train(
     use_cuda: bool,
     model_dir: str,
 ) -> None:
-    """returns trained model"""
+    """
+    Train the model and save to disk.
+
+    Args:
+      n_epochs (int): Total number of epochs to train.
+      loaders (dict): Data loaders for train and validation.
+      model (VGG): Model to train.
+      optimizer (Optimizer): Optimizer to use on training.
+      criterion (CrossEntropyLoss): Criterion to use on training.
+      use_cuda (bool): Use GPU Accelerated Computing.
+      model_dir (str): Directory to save model.
+    """
 
     valid_loss_min = np.Inf
 

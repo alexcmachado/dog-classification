@@ -3,6 +3,12 @@ from torch.nn import Linear
 
 
 def get_model() -> VGG:
+    """
+    Download pretrained VGG model and change size of last layer to 133.
+
+    Returns:
+      VGG: Pretrained VGG model.
+    """
     model = vgg11(pretrained=True)
 
     for param in model.features.parameters():

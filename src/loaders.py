@@ -17,6 +17,12 @@ BATCH_SIZE = 20
 
 
 def get_transforms() -> Tuple[Compose, ...]:
+    """
+    Create composition of transforms for train and validation datasets.
+
+    Returns:
+      tuple: Compositions for train and validation.
+    """
     transf_train = Compose(
         [
             RandomRotation(30),
@@ -40,6 +46,16 @@ def get_transforms() -> Tuple[Compose, ...]:
 
 
 def get_loaders(train_dir: str, valid_dir: str) -> Dict[str, DataLoader]:
+    """
+    Transform datasets and create dictionary with data loaders.
+
+    Args:
+      train_dir (str): Directory where train dataset is located.
+      valid_dir (str): Directory where validation dataset is located.
+
+    Returns:
+      dict: Data loaders for train and validation.
+    """
     print("Get train data loader.")
 
     transf_train, transf_valid = get_transforms()
