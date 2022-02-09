@@ -1,4 +1,5 @@
 import torch
+import os
 import numpy as np
 from torchvision.models import VGG
 from torch.nn import CrossEntropyLoss
@@ -11,6 +12,12 @@ from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
+def save_model_to_disk(model_dir: str, model: VGG) -> None:
+    save_path = os.path.join(model_dir, "model.pth")
+    with open(save_path, "wb") as f:
+        torch.save(model.state_dict(), f)
+
+
 def train(
     n_epochs: int,
     loaders: Dict[str, DataLoader],
@@ -18,8 +25,8 @@ def train(
     optimizer: Optimizer,
     criterion: CrossEntropyLoss,
     use_cuda: bool,
-    save_path: str,
-) -> VGG:
+    model_dir: str,
+) -> None:
     """returns trained model"""
 
     valid_loss_min = np.Inf
@@ -60,9 +67,5 @@ def train(
         )
 
         if valid_loss < valid_loss_min:
-            with open(save_path, "wb") as f:
-                torch.save(model.state_dict(), f)
-
+            save_model_to_disk(model_dir=model_dir, model=model)
             valid_loss_min = valid_loss
-
-    return model

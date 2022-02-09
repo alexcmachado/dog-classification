@@ -150,16 +150,14 @@ def run(configs: Configs) -> None:
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params=params_to_update, lr=0.001, momentum=0.9)
 
-    model_path = os.path.join(configs.model_dir, "model.pth")
-
-    model = train(
+    train(
         n_epochs=configs.epochs,
         loaders=loaders,
         model=model,
         optimizer=optimizer,
         criterion=criterion,
         use_cuda=configs.use_cuda,
-        save_path=model_path,
+        model_dir=configs.model_dir,
     )
 
 
