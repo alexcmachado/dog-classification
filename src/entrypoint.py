@@ -138,13 +138,12 @@ def run(configs: Namespace) -> None:
     torch.backends.cudnn.benchmark = False
 
     trainer = Trainer(configs.use_cuda)
+    trainer.get_pretrained_model()
     trainer.get_loaders(
         train_dir=configs.train_dir,
         valid_dir=configs.valid_dir,
     )
-    trainer.get_pretrained_model()
-    trainer.get_optimizer()
-    trainer.get_criterion()
+    trainer.prepare_training()
 
     trainer.train(n_epochs=configs.epochs, model_dir=configs.model_dir)
 

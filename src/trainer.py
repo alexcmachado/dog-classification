@@ -31,7 +31,6 @@ class Trainer:
       use_cuda (bool, optional): Use GPU Accelerated Computing.
       loaders (dict): Data loaders for train and validation.
       model (VGG): Pretrained VGG model.
-      params_to_update (list): Model parameters to be updated with training.
       optimizer (Optimizer): Optimizer to use on training.
       criterion (CrossEntropyLoss): Criterion to use on training.
     """
@@ -47,7 +46,6 @@ class Trainer:
 
         self.loaders = {}
         self.model = None
-        self.params_to_update = []
         self.optimizer = None
         self.criterion = None
 
@@ -116,25 +114,23 @@ class Trainer:
 
         self.model.classifier[6] = Linear(4096, 133, bias=True)
 
-        self.params_to_update = []
-        for name, param in self.model.named_parameters():
-            if param.requires_grad:
-                self.params_to_update.append(param)
-
         if self.use_cuda:
             self.model.cuda()
         print("Model loaded")
 
-    def get_optimizer(self) -> None:
-        """Create SGD optimizer for params_to_update"""
+    def prepare_training(self) -> None:
+        """Create SGD optimizer for params_to_update and create criterion."""
+        params_to_update = []
+        for name, param in self.model.named_parameters():
+            if param.requires_grad:
+                params_to_update.append(param)
+
         self.optimizer = torch.optim.SGD(
-            params=self.params_to_update,
+            params=params_to_update,
             lr=0.001,
             momentum=0.9,
         )
 
-    def get_criterion(self) -> None:
-        """Create criterion to use on training"""
         self.criterion = torch.nn.CrossEntropyLoss()
 
     def train(self, n_epochs: int, model_dir: str) -> None:
