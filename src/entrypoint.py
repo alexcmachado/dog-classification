@@ -1,11 +1,15 @@
+"""
+Define functions that need to run on training process.
+"""
+
 from argparse import Namespace, ArgumentParser
 import os
-import torch
-from PIL import Image
 import io
-from torchvision.models import VGG
 import base64
 from typing import Union
+import torch
+from PIL import Image
+from torchvision.models import VGG
 from torch import Tensor
 
 from trainer import Trainer
@@ -37,19 +41,18 @@ def model_fn(model_dir: str) -> VGG:
     return trainer.model
 
 
-def input_fn(input_data: Union[str, bytearray], content_type: str) -> Tensor:
+def input_fn(input_data: Union[str, bytearray]) -> Tensor:
     """
     Deserialize input, apply transforms and create batch.
     Move input to GPU, if available.
 
     Args:
       input_data (str | bytearray): Data to be deserialized.
-      content_type (str): Type of input data.
 
     Returns:
       Tensor: Tensor with input data.
     """
-    if type(input_data) == str:
+    if isinstance(input_data, str):
         input_data = base64.b64decode(input_data)
 
     img = Image.open(io.BytesIO(input_data))
@@ -131,7 +134,7 @@ def run(configs: Namespace) -> None:
     Args:
       configs (Configs): Configurations used for training.
     """
-    print("Use cuda: {}.".format(configs.use_cuda))
+    print(f"Use cuda: {configs.use_cuda}.")
 
     torch.manual_seed(configs.seed)
     torch.backends.cudnn.deterministic = True
@@ -149,6 +152,7 @@ def run(configs: Namespace) -> None:
 
 
 def main() -> None:
+    """Main function"""
     configs = parser_cli()
     run(configs)
 

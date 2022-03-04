@@ -1,6 +1,11 @@
-import torch
+"""
+Define a class used to train a convolutional neural network.
+"""
+
 import os
+import torch
 from torch.utils.data import DataLoader
+from torch.nn import Linear
 from torchvision import datasets
 from torchvision.transforms import (
     Compose,
@@ -12,9 +17,8 @@ from torchvision.transforms import (
     Resize,
     CenterCrop,
 )
-
 from torchvision.models import vgg11
-from torch.nn import Linear
+
 import numpy as np
 from PIL import ImageFile
 
@@ -121,7 +125,7 @@ class Trainer:
     def prepare_training(self) -> None:
         """Create SGD optimizer for params_to_update and create criterion."""
         params_to_update = []
-        for name, param in self.model.named_parameters():
+        for _, param in self.model.named_parameters():
             if param.requires_grad:
                 params_to_update.append(param)
 
@@ -153,7 +157,8 @@ class Trainer:
             valid_loss = self.validate_model(valid_loss)
 
             print(
-                f"Epoch: {epoch} \tTraining Loss: {train_loss:.6f} \tValidation Loss: {valid_loss:.6f}"
+                f"Epoch: {epoch} \tTraining Loss: {train_loss:.6f} "
+                f"\tValidation Loss: {valid_loss:.6f}"
             )
 
             if valid_loss < valid_loss_min:
@@ -217,8 +222,8 @@ class Trainer:
           model_dir (str): Directory to save model.
         """
         save_path = os.path.join(model_dir, "model.pth")
-        with open(save_path, "wb") as f:
-            torch.save(self.model.state_dict(), f)
+        with open(save_path, "wb") as file:
+            torch.save(self.model.state_dict(), file)
 
     def load_model_from_disk(self, model_dir: str) -> None:
         """
@@ -228,6 +233,6 @@ class Trainer:
           model_dir (str): Directory to load model.
         """
         load_path = os.path.join(model_dir, "model.pth")
-        with open(load_path, "rb") as f:
-            state_dict = torch.load(f, map_location=torch.device("cpu"))
+        with open(load_path, "rb") as file:
+            state_dict = torch.load(file)
             self.model.load_state_dict(state_dict)
