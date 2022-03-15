@@ -1,6 +1,6 @@
 # Convolutional Neural Network Classifier
 
-A Convolutional Neural Network to classify dog breeds using images as input. For images that contain a human instead of a dog, the algorithm should display which dog breed resembles the human in the picture.
+A Convolutional Neural Network to identify dog breeds using images as input. For images that contain a human instead of a dog, the algorithm should display which dog breed resembles the human in the picture.
 
 ## Tutorial
 
@@ -16,7 +16,7 @@ pip install -r requirements.txt
 
 ### Usage
 
-The [Jupyter Notebook](dog_app.ipynb) describes the steps to train and run a batch transform to test the obtained model.
+The [Jupyter Notebook](cnn_train_test.ipynb) describes the steps to train and run a batch transform to test the obtained model using AWS SageMaker resources.
 
 ## Contributing
 
